@@ -1250,4 +1250,62 @@ def plot_sample_spectra_from_latent_space(test_latents_RSN,ID_dict_discovered,pr
     ax.set_xlabel('Period [seconds]')
     ax.set_ylabel('Spectral Accel. [g]')
     # Save figure
-    plt.savefig('./scaled_means_'+file_name+'_'+str(i)+'.svg', transparent=True, bbox_inches='tight')  
+    plt.savefig('./scaled_means_'+file_name+'_'+str(i)+'.svg', transparent=True, bbox_inches='tight')
+    
+def wind_plot(spectra,T,file_name):
+    fig = plt.figure(figsize=small_fig_size)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.xaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
+    ax.xaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
+    ax.yaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
+    ax.yaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
+    # Set the axis limits
+    # ax.set_xscale('log')
+    ax.set_xlim(0, 150)
+    ax.set_ylim(0, 50)
+    # Edit the major and minor tick locations
+    # x_major = mpl.ticker.LogLocator(base = 10.0, numticks = 5)
+    # ax.xaxis.set_major_locator(x_major)
+    # x_minor = mpl.ticker.LogLocator(base = 10.0, subs = np.arange(1.0, 10.0) * 0.1, numticks = 10)
+    # ax.xaxis.set_minor_locator(x_minor)
+    # ax.xaxis.set_minor_formatter(mpl.ticker.NullFormatter())
+
+    # ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(5))
+    # ax.yaxis.set_minor_locator(mpl.ticker.MultipleLocator(2.5))
+    # plot
+    for ii in range(len(spectra)):
+        ax.plot(T,spectra[ii,:], linewidth=plt_line_width)
+    # Add the x and y-axis labels
+    ax.set_xlabel('Time [10min]')
+    ax.set_ylabel('Wind Speed. [m/s]')
+    # Save figure
+    plt.savefig('./'+file_name+'.svg', transparent=True, bbox_inches='tight')
+    
+def wind_plot_difference(spectra,T,file_name):
+    fig = plt.figure(figsize=small_fig_size)
+    ax = fig.add_axes([0, 0, 1, 1])
+    ax.xaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
+    ax.xaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
+    ax.yaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
+    ax.yaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
+    # # Set the axis limits
+    # ax.set_xscale('log')
+    # ax.set_xlim(0.05, 10)
+    # ax.set_ylim(-2.5, 2.5)
+    # # Edit the major and minor tick locations
+    # x_major = mpl.ticker.LogLocator(base = 10.0, numticks = 5)
+    # ax.xaxis.set_major_locator(x_major)
+    # x_minor = mpl.ticker.LogLocator(base = 10.0, subs = np.arange(1.0, 10.0) * 0.1, numticks = 10)
+    # ax.xaxis.set_minor_locator(x_minor)
+    # ax.xaxis.set_minor_formatter(mpl.ticker.NullFormatter())
+    
+    # ax.yaxis.set_major_locator(mpl.ticker.MultipleLocator(2))
+    # ax.yaxis.set_minor_locator(mpl.ticker.MultipleLocator(1))
+    # plot
+    for ii in range(len(spectra)):
+        ax.plot(T,spectra[ii,:], linewidth=plt_line_width)
+    # Add the x and y-axis labels
+    ax.set_xlabel('Time [10min]')
+    ax.set_ylabel('Wind Speed [m/s]')
+    # Save figure
+    plt.savefig('./'+file_name+'.svg', transparent=True, bbox_inches='tight')
