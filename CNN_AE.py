@@ -234,7 +234,7 @@ def train(train_tensor, model, num_epochs, learning_rate, print_every):
             # Weight update 
             optimizer.step()    
 
-            print_loss_total += loss
+            print_loss_total += loss.item()
                 
         if epoch % print_every == 0:  # every 100 epochs 
             # print the training loss
@@ -360,7 +360,7 @@ def get_SSE_and_sil(x):
 if __name__ == '__main__':
     
     # define the neural network parameters
-    num_epochs = 100
+    num_epochs = 10000
     learning_rate = 0.001
     print_every = 10
     LF = 5
@@ -528,6 +528,7 @@ if __name__ == '__main__':
     spectra_plot(np_test_inputs,T,'inputs')
     
     # plot output {reconstructed} spectral groups
+    np_test_outputs=np_test_outputs.squeeze()
     spectra_plot(np_test_outputs,T,'reconstructed_outputs')
     
     # plot difference from input and output
