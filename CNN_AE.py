@@ -136,6 +136,9 @@ class CNN_AE(nn.Module):
         output: input
             classified result
         '''
+        
+        #Conv1d expects inputs of shape [batch, channels, features]
+        x = x.unsqueeze(1)
 
         ############# enter conv encoder #############
         for i in range(self.num_layers):
@@ -155,7 +158,7 @@ class CNN_AE(nn.Module):
         output = self.decoder(latent_features)
         
         # reshape
-        x = output.view(1,32,4)
+        x = output.view(16,32,4)
          
         ############ enter conv decoder ##############
         for i in range(self.num_layers):
@@ -286,7 +289,7 @@ def postprocess(test_tensor):
         
     test_loss = test_loss / len(test_tensor.dataset)
     
-    return test_outputs, test_latent_list
+    return test_output_list, test_latent_list, test_input_list
 
 
 def save_model(model):
