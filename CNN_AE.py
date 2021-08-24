@@ -137,9 +137,6 @@ class CNN_AE(nn.Module):
             classified result
         '''
         
-        #Conv1d expects inputs of shape [batch, channels, features]
-        x = x.unsqueeze(1)
-
         ############# enter conv encoder #############
         for i in range(self.num_layers):
 
@@ -220,6 +217,9 @@ def train(train_tensor, model, num_epochs, learning_rate, print_every):
 
             # First renew the gradient
             optimizer.zero_grad()
+            
+            #Conv1d expects inputs of shape [batch, channels, features]
+            inputs = inputs.unsqueeze(1)
         
             # Second calculate the model outputs
             outputs, output_latent = model(inputs)
@@ -229,7 +229,6 @@ def train(train_tensor, model, num_epochs, learning_rate, print_every):
     
             # Fourth backpropagation
             loss.backward()
-            # train_loss.backward()
             
             # Weight update 
             optimizer.step()    
@@ -279,6 +278,10 @@ def postprocess(test_tensor):
     
         inputs, targets = inputs.cuda(), targets.cuda()
         #inputs, targets = inputs, targets
+        
+        #Conv1d expects inputs of shape [batch, channels, features]
+        inputs = inputs.unsqueeze(1)
+        
         # find loss for the test data
         test_outputs, test_output_latent = model(inputs)
         test_loss += loss_func(test_outputs, inputs)
@@ -525,6 +528,7 @@ if __name__ == '__main__':
     loss_plot(train_loss_list[1:],print_every)
     
     # plot input spectral groups
+    np_test_inputs=np_test_inputs.squeeze()
     spectra_plot(np_test_inputs,T,'inputs')
     
     # plot output {reconstructed} spectral groups
