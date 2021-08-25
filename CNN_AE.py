@@ -111,11 +111,11 @@ class CNN_AE(nn.Module):
         self.encoder = nn.Sequential(
             nn.Linear(128, 32),
             nn.ReLU(True),
-            nn.Linear(32, 9),
+            nn.Linear(32, LF),
             nn.ReLU(True))
         
         self.decoder = nn.Sequential(
-            nn.Linear(9, 32),
+            nn.Linear(LF, 32),
             nn.ReLU(True),
             nn.Linear(32, 128),
             nn.ReLU(True))
@@ -155,7 +155,7 @@ class CNN_AE(nn.Module):
         output = self.decoder(latent_features)
         
         # reshape
-        x = output.view(16,32,4)
+        x = output.view(BATCH_SIZE,32,4)
          
         ############ enter conv decoder ##############
         for i in range(self.num_layers):
@@ -363,7 +363,7 @@ def get_SSE_and_sil(x):
 if __name__ == '__main__':
     
     # define the neural network parameters
-    num_epochs = 10000
+    num_epochs = 1000
     learning_rate = 0.001
     print_every = 10
     LF = 5
