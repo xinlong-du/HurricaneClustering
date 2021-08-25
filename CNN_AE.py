@@ -24,6 +24,8 @@ from publish_plots import spectra_plot
 from publish_plots import spectra_plot_difference
 from publish_plots import elbow_sil_graph
 from publish_plots import Discrete_3D_scatter
+from publish_plots import wind_plot
+from publish_plots import wind_plot_difference
 
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -174,7 +176,7 @@ class ground_motion_data():
     
         # load files
         x=[]
-        file_name = 'Sa_ln_sub_first_T_synthetic_NL10.txt'
+        file_name = 'hurricaneRecords.txt'
         spectra = np.loadtxt(file_name)
         x = np.delete(spectra,0,0)
         num_GM = len(spectra[0,:])
@@ -261,9 +263,9 @@ def postprocess(test_tensor):
     model = CNN_AE(
         input_channels = [1, 4, 8, 16], 
         output_channels = [4, 8, 16, 32], 
-        kernel_size = [18, 12, 10, 4], 
-        stride = [4, 4, 4, 4], 
-        padding = [1, 1, 1, 1]).cuda()   
+        kernel_size = [19, 12, 10, 4], 
+        stride = [2, 2, 2, 2], 
+        padding = [0, 0, 0, 0]).cuda()   
     load_model(model)
     
     # define the loss function 
@@ -363,7 +365,7 @@ def get_SSE_and_sil(x):
 if __name__ == '__main__':
     
     # define the neural network parameters
-    num_epochs = 1000
+    num_epochs = 10000
     learning_rate = 0.001
     print_every = 10
     LF = 5
@@ -374,7 +376,7 @@ if __name__ == '__main__':
     os.chdir(folder_path) # change directory  
     
     # load files and create dictionaries
-    file_name = 'Ordered_RSN_005.txt'
+    file_name = 'hurricaneID.txt'
     RSN_read = open(file_name,"r")
     RSN_list = [int(line[:-1]) for line in RSN_read]
     
@@ -393,7 +395,7 @@ if __name__ == '__main__':
     
     # load scaled spectra data
     scaled_spectra = []
-    file_name = 'Sa_ln_sub_first_T_synthetic_NL10.txt'
+    file_name = 'hurricaneRecords.txt'
     scaled_spectra = np.loadtxt(file_name)
     
     end = len(scaled_spectra-1)
@@ -419,9 +421,9 @@ if __name__ == '__main__':
     model = CNN_AE(
         input_channels = [1, 4, 8, 16], 
         output_channels = [4, 8, 16, 32], 
-        kernel_size = [18, 12, 10, 4], 
-        stride = [4, 4, 4, 4], 
-        padding = [1, 1, 1, 1]).cuda()    
+        kernel_size = [19, 12, 10, 4], 
+        stride = [2, 2, 2, 2], 
+        padding = [0, 0, 0, 0]).cuda()    
     
     start = time.time()
     # train the model
@@ -521,7 +523,7 @@ if __name__ == '__main__':
     ID_dict_discovered = dict(zip_iterator)
     ########################################################################### CREATE PLOTS
         
-    T = np.linspace(0.05,10,996)
+    T = np.linspace(0,148,149)
     test_latent_list = torch.load('test_latent_list.pt',map_location=torch.device('cpu'))
     
     # plot training loss
@@ -529,14 +531,14 @@ if __name__ == '__main__':
     
     # plot input spectral groups
     np_test_inputs=np_test_inputs.squeeze()
-    spectra_plot(np_test_inputs,T,'inputs')
+    wind_plot(np_test_inputs,T,'inputs')
     
     # plot output {reconstructed} spectral groups
     np_test_outputs=np_test_outputs.squeeze()
-    spectra_plot(np_test_outputs,T,'reconstructed_outputs')
+    wind_plot(np_test_outputs,T,'reconstructed_outputs')
     
     # plot difference from input and output
-    spectra_plot_difference(np_test_inputs-np_test_outputs,T,'reconstruction_difference')
+    wind_plot_difference(np_test_inputs-np_test_outputs,T,'reconstruction_difference')
     
     # plot shilloette score and elbow graph
     elbow_sil_graph(SSE,sil,'elbow_sil_graph')
@@ -545,10 +547,22 @@ if __name__ == '__main__':
     # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,principalComponents_latents,[0,1,2],'Principal Comp. ','Ground Truth Clusters','PC_3D_gt',num_clusters)
     # Discrete_3D_scatter(test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'Principal Comp. ','Discovered Clusters','PC_3D_discovered',num_clusters)
     
-  
-    
-    
-
-
-
-
+#%%
+import matplotlib.pyplot as plt
+small_fig_size = (4,3)
+plt_line_width = 0.8
+for ii in range(len(np_test_inputs)):
+    fig = plt.figure(figsize=small_fig_size)
+    ax = fig.add_axes([0, 0, 1, 1])
+    line_ori,=ax.plot(T,np_test_inputs[ii,:], linewidth=plt_line_width)    
+    line_rec,=ax.plot(T,np_test_outputs[ii,:], linewidth=plt_line_width)
+    ax.legend([line_ori,line_rec],['Original','Reconstructed'])
+    ax.set_xlabel('Time [10min]')
+    ax.set_ylabel('Wind Speed. [m/s]')
+#%%
+for ii in range(len(np_test_inputs)):
+    fig = plt.figure(figsize=small_fig_size)
+    ax = fig.add_axes([0, 0, 1, 1])
+    line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
+    ax.set_xlabel('Time [10min]')
+    ax.set_ylabel('Wind Speed. [m/s]')     
