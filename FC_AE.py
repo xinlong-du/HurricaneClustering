@@ -89,7 +89,7 @@ class ground_motion_data():
     
         # load files
         x=[]
-        file_name = 'windRecords.txt'
+        file_name = 'hurricaneRecords.txt'
         spectra = np.loadtxt(file_name)
         x = np.delete(spectra,0,0)
         num_GM = len(spectra[0,:])
@@ -268,7 +268,7 @@ if __name__ == '__main__':
     os.chdir(folder_path) # change directory  
     
     # load files and create dictionaries
-    file_name = 'Ordered_RSN_005.txt'
+    file_name = 'hurricaneID.txt'
     RSN_read = open(file_name,"r")
     RSN_list = [int(line[:-1]) for line in RSN_read]
     
@@ -287,7 +287,7 @@ if __name__ == '__main__':
     
     # load scaled spectra data
     scaled_spectra = []
-    file_name = 'windRecords.txt'
+    file_name = 'hurricaneRecords.txt'
     scaled_spectra = np.loadtxt(file_name)
     
     end = len(scaled_spectra-1)
