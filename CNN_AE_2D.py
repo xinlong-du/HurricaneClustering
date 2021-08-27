@@ -176,13 +176,14 @@ class ground_motion_data():
     
         # load files
         x=[]
-        file_name = 'hurricaneRecords.txt'
+        file_name = 'hurricaneRecords2D.txt'
         spectra = np.loadtxt(file_name)
         x = np.delete(spectra,0,0)
-        num_GM = len(spectra[0,:])
+        num_GM = len(RSN_list)
         for GM in range(0,num_GM):
-            spec = torch.tensor(x[:,GM],dtype = torch.float32)
-            RSN_list[GM] = torch.tensor(spectra[0,GM], dtype=torch.long)
+            spec = torch.tensor(x[:,2*GM:(2*GM+2)],dtype = torch.float32)
+            spec = torch.transpose(spec,0,1)
+            RSN_list[GM] = torch.tensor(spectra[0,2*GM], dtype=torch.long)
             self.samples.append((spec,RSN_list[GM]))
 
     def __len__(self):
@@ -220,9 +221,6 @@ def train(train_tensor, model, num_epochs, learning_rate, print_every):
             # First renew the gradient
             optimizer.zero_grad()
             
-            #Conv1d expects inputs of shape [batch, channels, features]
-            inputs = inputs.unsqueeze(1)
-        
             # Second calculate the model outputs
             outputs, output_latent = model(inputs)
 
@@ -261,9 +259,9 @@ def postprocess(test_tensor):
     # for prediction after having the best model
     
     model = CNN_AE(
-        input_channels = [1, 4, 8, 16], 
+        input_channels = [2, 4, 8, 16], 
         output_channels = [4, 8, 16, 32], 
-        kernel_size = [19, 12, 10, 4], 
+        kernel_size = [12, 12, 10, 4], 
         stride = [2, 2, 2, 2], 
         padding = [0, 0, 0, 0]).cuda()   
     load_model(model)
@@ -280,9 +278,6 @@ def postprocess(test_tensor):
     
         inputs, targets = inputs.cuda(), targets.cuda()
         #inputs, targets = inputs, targets
-        
-        #Conv1d expects inputs of shape [batch, channels, features]
-        inputs = inputs.unsqueeze(1)
         
         # find loss for the test data
         test_outputs, test_output_latent = model(inputs)
@@ -376,7 +371,7 @@ if __name__ == '__main__':
     os.chdir(folder_path) # change directory  
     
     # load files and create dictionaries
-    file_name = 'hurricaneID.txt'
+    file_name = 'hurricaneID2D.txt'
     RSN_read = open(file_name,"r")
     RSN_list = [int(line[:-1]) for line in RSN_read]
     
@@ -395,7 +390,7 @@ if __name__ == '__main__':
     
     # load scaled spectra data
     scaled_spectra = []
-    file_name = 'hurricaneRecords.txt'
+    file_name = 'hurricaneRecords2D.txt'
     scaled_spectra = np.loadtxt(file_name)
     
     end = len(scaled_spectra-1)
@@ -419,9 +414,9 @@ if __name__ == '__main__':
     # initialize the autoencoder model
     # .cuda() means putting the model into GPU    
     model = CNN_AE(
-        input_channels = [1, 4, 8, 16], 
+        input_channels = [2, 4, 8, 16], 
         output_channels = [4, 8, 16, 32], 
-        kernel_size = [19, 12, 10, 4], 
+        kernel_size = [12, 12, 10, 4], 
         stride = [2, 2, 2, 2], 
         padding = [0, 0, 0, 0]).cuda()    
     
@@ -523,7 +518,7 @@ if __name__ == '__main__':
     ID_dict_discovered = dict(zip_iterator)
     ########################################################################### CREATE PLOTS
         
-    T = np.linspace(0,148,149)
+    T = np.linspace(0,141,142)
     test_latent_list = torch.load('test_latent_list.pt',map_location=torch.device('cpu'))
     
     # plot training loss
@@ -554,8 +549,8 @@ plt_line_width = 0.8
 for ii in range(len(np_test_inputs)):
     fig = plt.figure(figsize=small_fig_size)
     ax = fig.add_axes([0, 0, 1, 1])
-    line_ori,=ax.plot(T,np_test_inputs[ii,:], linewidth=plt_line_width)    
-    line_rec,=ax.plot(T,np_test_outputs[ii,:], linewidth=plt_line_width)
+    line_ori,=ax.plot(T,np_test_inputs[ii,1,:], linewidth=plt_line_width)    
+    line_rec,=ax.plot(T,np_test_outputs[ii,1,:], linewidth=plt_line_width)
     ax.legend([line_ori,line_rec],['Original','Reconstructed'])
     ax.set_xlabel('Time [10min]')
     ax.set_ylabel('Wind Speed. [m/s]')
@@ -563,6 +558,6 @@ for ii in range(len(np_test_inputs)):
 for ii in range(len(np_test_inputs)):
     fig = plt.figure(figsize=small_fig_size)
     ax = fig.add_axes([0, 0, 1, 1])
-    line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
+    line_err,=ax.plot(T,np_test_outputs[ii,0,:]-np_test_inputs[ii,0,:], linewidth=plt_line_width)
     ax.set_xlabel('Time [10min]')
     ax.set_ylabel('Wind Speed. [m/s]')     
