@@ -48,7 +48,7 @@ class FNN_AE(nn.Module):
         super(FNN_AE, self).__init__()
 
         ################################ SYNTHETIC DATABASE AARCHITECTURE #####
-        input_dim = 149
+        input_dim = 284
         # nn.Linear(in_features, out_features)
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, 128),
@@ -89,7 +89,7 @@ class ground_motion_data():
     
         # load files
         x=[]
-        file_name = 'hurricaneRecords.txt'
+        file_name = 'hurricaneRecords2Dto1D.txt'
         spectra = np.loadtxt(file_name)
         x = np.delete(spectra,0,0)
         num_GM = len(spectra[0,:])
@@ -268,7 +268,7 @@ if __name__ == '__main__':
     os.chdir(folder_path) # change directory  
     
     # load files and create dictionaries
-    file_name = 'hurricaneID.txt'
+    file_name = 'hurricaneID2D.txt'
     RSN_read = open(file_name,"r")
     RSN_list = [int(line[:-1]) for line in RSN_read]
     
@@ -287,7 +287,7 @@ if __name__ == '__main__':
     
     # load scaled spectra data
     scaled_spectra = []
-    file_name = 'hurricaneRecords.txt'
+    file_name = 'hurricaneRecords2Dto1D.txt'
     scaled_spectra = np.loadtxt(file_name)
     
     end = len(scaled_spectra-1)
@@ -409,7 +409,7 @@ if __name__ == '__main__':
     ID_dict_discovered = dict(zip_iterator)
     ########################################################################### CREATE PLOTS
         
-    T = np.linspace(0,148,149)
+    T = np.linspace(0,283,284)
     test_latent_list = torch.load('test_latent_list.pt',map_location=torch.device('cpu'))
     
     # plot training loss
