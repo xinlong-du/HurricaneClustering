@@ -253,16 +253,16 @@ def get_SSE_and_sil(x):
       sil.append(silhouette_score(x, labels, metric = 'euclidean'))
     
     return(SSE,sil)  
-    
+#%%    
 if __name__ == '__main__':
     
     # define the neural network parameters
-    num_epochs = 10000
+    num_epochs = 5000
     learning_rate = 0.001
     print_every = 10
     LF = 5
     BATCH_SIZE = 16
-    ########################################################################### DOWNLOAD DATA
+    #%%####################### DOWNLOAD DATA #################################
     #  data folder path
     folder_path = './data'
     os.chdir(folder_path) # change directory  
@@ -299,7 +299,7 @@ if __name__ == '__main__':
     zip_iterator = zip(RSN, spectra)
     Sa_dictionary = dict(zip_iterator) 
     
-    ########################################################################### TRAIN MODEL 
+    #%%########################### TRAIN MODEL ###############################
     # change output folder path
     folder_path = './figures'
     try:
@@ -353,7 +353,7 @@ if __name__ == '__main__':
     pickle.dump(Sa_dictionary, a_file)
     a_file.close()  
     
-    ########################################################################### POST PROCESS AND CREATE PLOTS
+    #%%############## POST PROCESS ###########################################
     # download tensors
     test_latent_list = torch.load('test_latent_list.pt')
     test_outputs = torch.load('test_outputs.pt')
@@ -377,8 +377,7 @@ if __name__ == '__main__':
     Sa_dictionary = pickle.load(a_file)
     a_file.close()
     
-    ########################################################################### PCA
-    
+    #%%############################# PCA #####################################    
     # Perform PCA on the latent features
     feat_cols = ['feature'+str(i) for i in range(np_latent_features.shape[1])]
     normalised_latents = pd.DataFrame(np_latent_features,columns=feat_cols)
@@ -392,7 +391,7 @@ if __name__ == '__main__':
     
     print('Explained variation per principal component: {}'.format(pca_latents.explained_variance_ratio_))
     
-    ########################################################################### K-MEANS Clustering
+    #%%######################### K-MEANS Clustering ##########################
     x = test_latents.cpu()
     SSE,sil = get_SSE_and_sil(np_latent_features)
     num_clusters = 4
@@ -407,8 +406,7 @@ if __name__ == '__main__':
     # create cluster ID dictionary
     zip_iterator = zip(np_test_latents_RSN, np_cluster_ids_x)
     ID_dict_discovered = dict(zip_iterator)
-    ########################################################################### CREATE PLOTS
-        
+    #%%############################ CREATE PLOTS #############################        
     T = np.linspace(0,283,284)
     test_latent_list = torch.load('test_latent_list.pt',map_location=torch.device('cpu'))
     
@@ -433,18 +431,28 @@ if __name__ == '__main__':
     
 #%%
 import matplotlib.pyplot as plt
-small_fig_size = (4,3)
+small_fig_size = (9,3)
 plt_line_width = 0.8
-for ii in range(len(np_test_inputs)):
+T2 = np.linspace(0,141,142)
+for ii in range(len(np_test_inputs)-185):
     fig = plt.figure(figsize=small_fig_size)
-    ax = fig.add_axes([0, 0, 1, 1])
-    line_ori,=ax.plot(T,np_test_inputs[ii,:], linewidth=plt_line_width)    
-    line_rec,=ax.plot(T,np_test_outputs[ii,:], linewidth=plt_line_width)
-    ax.legend([line_ori,line_rec],['Original','Reconstructed'])
-    ax.set_xlabel('Time [10min]')
-    ax.set_ylabel('Wind Speed. [m/s]')
+    ax = fig.add_subplot(121)
+    line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
+    line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
+    ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
+    ax.set_xlabel('Time [10min]',fontsize=10)
+    ax.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+        
+    ax = fig.add_subplot(122)
+    line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
+    line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
+    ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
+    ax.set_xlabel('Time [10min]',fontsize=10)
+    ax.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
 #%%
-for ii in range(len(np_test_inputs)):
+for ii in range(len(np_test_inputs)-185):
     fig = plt.figure(figsize=small_fig_size)
     ax = fig.add_axes([0, 0, 1, 1])
     line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)

@@ -1261,8 +1261,8 @@ def wind_plot(spectra,T,file_name):
     ax.yaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
     # Set the axis limits
     # ax.set_xscale('log')
-    ax.set_xlim(0, 150)
-    ax.set_ylim(0, 50)
+    # ax.set_xlim(0, 150)
+    # ax.set_ylim(0, 50)
     # Edit the major and minor tick locations
     # x_major = mpl.ticker.LogLocator(base = 10.0, numticks = 5)
     # ax.xaxis.set_major_locator(x_major)
