@@ -48,7 +48,7 @@ class FNN_AE(nn.Module):
         super(FNN_AE, self).__init__()
 
         ################################ SYNTHETIC DATABASE AARCHITECTURE #####
-        input_dim = 284
+        input_dim = 308
         # nn.Linear(in_features, out_features)
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, 128),
@@ -89,7 +89,7 @@ class ground_motion_data():
     
         # load files
         x=[]
-        file_name = 'hurricaneRecords2Dto1D.txt'
+        file_name = 'hurricaneRecords2Dto1Dramp.txt'
         spectra = np.loadtxt(file_name)
         x = np.delete(spectra,0,0)
         num_GM = len(spectra[0,:])
@@ -287,7 +287,7 @@ if __name__ == '__main__':
     
     # load scaled spectra data
     scaled_spectra = []
-    file_name = 'hurricaneRecords2Dto1D.txt'
+    file_name = 'hurricaneRecords2Dto1Dramp.txt'
     scaled_spectra = np.loadtxt(file_name)
     
     end = len(scaled_spectra-1)
@@ -407,7 +407,7 @@ if __name__ == '__main__':
     zip_iterator = zip(np_test_latents_RSN, np_cluster_ids_x)
     ID_dict_discovered = dict(zip_iterator)
     #%%############################ CREATE PLOTS #############################        
-    T = np.linspace(0,283,284)
+    T = np.linspace(0,307,308)
     test_latent_list = torch.load('test_latent_list.pt',map_location=torch.device('cpu'))
     
     # plot training loss
@@ -433,7 +433,7 @@ if __name__ == '__main__':
 import matplotlib.pyplot as plt
 small_fig_size = (9,3)
 plt_line_width = 0.8
-T2 = np.linspace(0,141,142)
+T2 = np.linspace(0,153,154)
 for ii in range(len(np_test_inputs)-185):
     fig = plt.figure(figsize=small_fig_size)
     ax = fig.add_subplot(121)
