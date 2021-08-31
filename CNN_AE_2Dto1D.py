@@ -176,7 +176,7 @@ class ground_motion_data():
     
         # load files
         x=[]
-        file_name = 'hurricaneRecords.txt'
+        file_name = 'hurricaneRecords2Dto1Dramp.txt'
         spectra = np.loadtxt(file_name)
         x = np.delete(spectra,0,0)
         num_GM = len(spectra[0,:])
@@ -261,11 +261,11 @@ def postprocess(test_tensor):
     # for prediction after having the best model
     
     model = CNN_AE(
-        input_channels = [1, 4, 8, 16], 
-        output_channels = [4, 8, 16, 32], 
-        kernel_size = [19, 12, 10, 4], 
-        stride = [2, 2, 2, 2], 
-        padding = [0, 0, 0, 0]).cuda()   
+        input_channels = [1, 2, 4, 8, 16], 
+        output_channels = [2, 4, 8, 16, 32], 
+        kernel_size = [18, 12, 10, 8, 6], 
+        stride = [2, 2, 2, 2, 2], 
+        padding = [0, 0, 0, 0, 0]).cuda()   
     load_model(model)
     
     # define the loss function 
@@ -395,7 +395,7 @@ if __name__ == '__main__':
     
     # load scaled spectra data
     scaled_spectra = []
-    file_name = 'hurricaneRecords.txt'
+    file_name = 'hurricaneRecords2Dto1Dramp.txt'
     scaled_spectra = np.loadtxt(file_name)
     
     end = len(scaled_spectra-1)
@@ -419,11 +419,11 @@ if __name__ == '__main__':
     # initialize the autoencoder model
     # .cuda() means putting the model into GPU    
     model = CNN_AE(
-        input_channels = [1, 4, 8, 16], 
-        output_channels = [4, 8, 16, 32], 
-        kernel_size = [19, 12, 10, 4], 
-        stride = [2, 2, 2, 2], 
-        padding = [0, 0, 0, 0]).cuda()    
+        input_channels = [1, 2, 4, 8, 16], 
+        output_channels = [2, 4, 8, 16, 32], 
+        kernel_size = [18, 12, 10, 8, 6], 
+        stride = [2, 2, 2, 2, 2], 
+        padding = [0, 0, 0, 0, 0]).cuda()    
     
     start = time.time()
     # train the model
@@ -523,7 +523,7 @@ if __name__ == '__main__':
     ID_dict_discovered = dict(zip_iterator)
     ########################################################################### CREATE PLOTS
         
-    T = np.linspace(0,148,149)
+    T = np.linspace(0,307,308)
     test_latent_list = torch.load('test_latent_list.pt',map_location=torch.device('cpu'))
     
     # plot training loss
@@ -549,20 +549,30 @@ if __name__ == '__main__':
     
 #%%
 import matplotlib.pyplot as plt
-small_fig_size = (4,3)
+small_fig_size = (9,3)
 plt_line_width = 0.8
-for ii in range(len(np_test_inputs)):
+T2 = np.linspace(0,153,154)
+for ii in range(len(np_test_inputs)-185):
     fig = plt.figure(figsize=small_fig_size)
-    ax = fig.add_axes([0, 0, 1, 1])
-    line_ori,=ax.plot(T,np_test_inputs[ii,:], linewidth=plt_line_width)    
-    line_rec,=ax.plot(T,np_test_outputs[ii,:], linewidth=plt_line_width)
-    ax.legend([line_ori,line_rec],['Original','Reconstructed'])
-    ax.set_xlabel('Time [10min]')
-    ax.set_ylabel('Wind Speed. [m/s]')
+    ax = fig.add_subplot(121)
+    line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
+    line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
+    ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
+    ax.set_xlabel('Time [10min]',fontsize=10)
+    ax.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+        
+    ax = fig.add_subplot(122)
+    line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
+    line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
+    ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
+    ax.set_xlabel('Time [10min]',fontsize=10)
+    ax.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
 #%%
-for ii in range(len(np_test_inputs)):
+for ii in range(len(np_test_inputs)-185):
     fig = plt.figure(figsize=small_fig_size)
     ax = fig.add_axes([0, 0, 1, 1])
     line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
     ax.set_xlabel('Time [10min]')
-    ax.set_ylabel('Wind Speed. [m/s]')     
+    ax.set_ylabel('Wind Speed. [m/s]')                        
