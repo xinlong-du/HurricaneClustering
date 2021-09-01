@@ -27,6 +27,7 @@ from publish_plots import elbow_sil_graph
 from publish_plots import Discrete_3D_scatter
 from publish_plots import wind_plot
 from publish_plots import wind_plot_difference
+from publish_plots import Continuous_3D_scatter
 
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
@@ -458,3 +459,92 @@ for ii in range(len(np_test_inputs)-185):
     line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
     ax.set_xlabel('Time [10min]')
     ax.set_ylabel('Wind Speed. [m/s]')                        
+#%% plot latent features clustered using K-means
+Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','LF123')
+Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','LF345')
+#%% plot wind records for different clusters
+cluster1_list=[]
+cluster2_list=[]
+cluster3_list=[]
+cluster4_list=[]
+for i in range(len(test_latents_RSN)):
+    if ID_dict_discovered[int(test_latents_RSN[i])]==1:
+        cluster1_list.append(int(test_latents_RSN[i]))
+    elif ID_dict_discovered[int(test_latents_RSN[i])]==2:
+        cluster2_list.append(int(test_latents_RSN[i]))
+    elif ID_dict_discovered[int(test_latents_RSN[i])]==3:
+        cluster3_list.append(int(test_latents_RSN[i]))
+    elif ID_dict_discovered[int(test_latents_RSN[i])]==4:
+        cluster4_list.append(int(test_latents_RSN[i]))
+
+fig = plt.figure(figsize=small_fig_size)
+ax1 = fig.add_subplot(121)
+ax2 = fig.add_subplot(122)
+for ii in cluster1_list:
+    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
+    ax1.set_xlabel('Time [10min]',fontsize=10)
+    ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+
+    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
+    ax2.set_xlabel('Time [10min]',fontsize=10)
+    ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+
+fig = plt.figure(figsize=small_fig_size)
+ax1 = fig.add_subplot(121)
+ax2 = fig.add_subplot(122)
+for ii in cluster2_list:
+    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
+    ax1.set_xlabel('Time [10min]',fontsize=10)
+    ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+
+    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
+    ax2.set_xlabel('Time [10min]',fontsize=10)
+    ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+    
+fig = plt.figure(figsize=small_fig_size)
+ax1 = fig.add_subplot(121)
+ax2 = fig.add_subplot(122)
+for ii in cluster3_list:
+    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
+    ax1.set_xlabel('Time [10min]',fontsize=10)
+    ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+
+    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
+    ax2.set_xlabel('Time [10min]',fontsize=10)
+    ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+    
+fig = plt.figure(figsize=small_fig_size)
+ax1 = fig.add_subplot(121)
+ax2 = fig.add_subplot(122)
+for ii in cluster4_list:
+    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
+    ax1.set_xlabel('Time [10min]',fontsize=10)
+    ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+
+    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
+    ax2.set_xlabel('Time [10min]',fontsize=10)
+    ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+#%% save the clusters
+with open('cluster1.txt', 'w') as f:
+    for item in cluster1_list:
+        f.write("%s\n" % item)
+        
+with open('cluster2.txt', 'w') as f:
+    for item in cluster2_list:
+        f.write("%s\n" % item)
+        
+with open('cluster3.txt', 'w') as f:
+    for item in cluster3_list:
+        f.write("%s\n" % item)
+        
+with open('cluster4.txt', 'w') as f:
+    for item in cluster4_list:
+        f.write("%s\n" % item)
