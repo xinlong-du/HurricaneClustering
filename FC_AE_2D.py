@@ -395,7 +395,7 @@ if __name__ == '__main__':
     #%%######################### K-MEANS Clustering ##########################
     x = test_latents.cpu()
     SSE,sil = get_SSE_and_sil(np_latent_features)
-    num_clusters = 4
+    num_clusters = 5
     # k-means cluster
     cluster_ids_x, cluster_centers = kmeans(
         X=x, num_clusters=num_clusters, distance='euclidean', device=torch.device('cpu') ) 
@@ -467,6 +467,7 @@ cluster1_list=[]
 cluster2_list=[]
 cluster3_list=[]
 cluster4_list=[]
+cluster5_list=[]
 for i in range(len(test_latents_RSN)):
     if ID_dict_discovered[int(test_latents_RSN[i])]==1:
         cluster1_list.append(int(test_latents_RSN[i]))
@@ -476,6 +477,8 @@ for i in range(len(test_latents_RSN)):
         cluster3_list.append(int(test_latents_RSN[i]))
     elif ID_dict_discovered[int(test_latents_RSN[i])]==4:
         cluster4_list.append(int(test_latents_RSN[i]))
+    elif ID_dict_discovered[int(test_latents_RSN[i])]==5:
+        cluster5_list.append(int(test_latents_RSN[i]))
 
 fig = plt.figure(figsize=small_fig_size)
 ax1 = fig.add_subplot(121)
@@ -532,6 +535,20 @@ for ii in cluster4_list:
     ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
     plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
     plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+    
+fig = plt.figure(figsize=small_fig_size)
+ax1 = fig.add_subplot(121)
+ax2 = fig.add_subplot(122)
+for ii in cluster5_list:
+    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
+    ax1.set_xlabel('Time [10min]',fontsize=10)
+    ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+
+    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
+    ax2.set_xlabel('Time [10min]',fontsize=10)
+    ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
 #%% save the clusters
 with open('cluster1.txt', 'w') as f:
     for item in cluster1_list:
@@ -547,4 +564,8 @@ with open('cluster3.txt', 'w') as f:
         
 with open('cluster4.txt', 'w') as f:
     for item in cluster4_list:
+        f.write("%s\n" % item)
+        
+with open('cluster5.txt', 'w') as f:
+    for item in cluster5_list:
         f.write("%s\n" % item)
