@@ -113,14 +113,12 @@ class CNN_AE(nn.Module):
         self.encoder = nn.Sequential(
             nn.Linear(128, 32),
             nn.ReLU(True),
-            nn.Linear(32, LF),
-            nn.ReLU(True))
+            nn.Linear(32, LF))
         
         self.decoder = nn.Sequential(
             nn.Linear(LF, 32),
             nn.ReLU(True),
-            nn.Linear(32, 128),
-            nn.ReLU(True))
+            nn.Linear(32, 128))
 
         
     def forward(self, x):
