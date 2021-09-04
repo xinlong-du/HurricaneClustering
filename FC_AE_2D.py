@@ -242,7 +242,7 @@ def calculate_WSS(points, kmax):
 def get_SSE_and_sil(x):
     
     sil = []
-    kmax = 40
+    kmax = 20
     
     # Kmeans Validation
     SSE = calculate_WSS(x,kmax)
@@ -395,7 +395,7 @@ if __name__ == '__main__':
     #%%######################### K-MEANS Clustering ##########################
     x = test_latents.cpu()
     SSE,sil = get_SSE_and_sil(np_latent_features)
-    num_clusters = 5
+    num_clusters = 4
     # k-means cluster
     cluster_ids_x, cluster_centers = kmeans(
         X=x, num_clusters=num_clusters, distance='euclidean', device=torch.device('cpu') ) 
@@ -463,109 +463,34 @@ for ii in range(len(np_test_inputs)-185):
 Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','LF123')
 Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','LF345')
 #%% plot wind records for different clusters
-cluster1_list=[]
-cluster2_list=[]
-cluster3_list=[]
-cluster4_list=[]
-cluster5_list=[]
+cluster_list=[[] for _ in range(num_clusters)]
 for i in range(len(test_latents_RSN)):
-    if ID_dict_discovered[int(test_latents_RSN[i])]==1:
-        cluster1_list.append(int(test_latents_RSN[i]))
-    elif ID_dict_discovered[int(test_latents_RSN[i])]==2:
-        cluster2_list.append(int(test_latents_RSN[i]))
-    elif ID_dict_discovered[int(test_latents_RSN[i])]==3:
-        cluster3_list.append(int(test_latents_RSN[i]))
-    elif ID_dict_discovered[int(test_latents_RSN[i])]==4:
-        cluster4_list.append(int(test_latents_RSN[i]))
-    elif ID_dict_discovered[int(test_latents_RSN[i])]==5:
-        cluster5_list.append(int(test_latents_RSN[i]))
+    for ii in range(num_clusters):
+        if ID_dict_discovered[int(test_latents_RSN[i])]==ii+1:
+            cluster_list[ii].append(int(test_latents_RSN[i]))
 
-fig = plt.figure(figsize=small_fig_size)
-ax1 = fig.add_subplot(121)
-ax2 = fig.add_subplot(122)
-for ii in cluster1_list:
-    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
-    ax1.set_xlabel('Time [10min]',fontsize=10)
-    ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
-
-    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
-    ax2.set_xlabel('Time [10min]',fontsize=10)
-    ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+for i in range(num_clusters):
+    fig = plt.figure(figsize=small_fig_size)
+    ax1 = fig.add_subplot(121)
+    ax2 = fig.add_subplot(122)
     plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
     plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+    for ii in cluster_list[i]:
+        line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
+        ax1.set_xlabel('Time [10min]',fontsize=10)
+        ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
 
-fig = plt.figure(figsize=small_fig_size)
-ax1 = fig.add_subplot(121)
-ax2 = fig.add_subplot(122)
-for ii in cluster2_list:
-    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
-    ax1.set_xlabel('Time [10min]',fontsize=10)
-    ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+        line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
+        ax2.set_xlabel('Time [10min]',fontsize=10)
+        ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
 
-    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
-    ax2.set_xlabel('Time [10min]',fontsize=10)
-    ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
-    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
-    
-fig = plt.figure(figsize=small_fig_size)
-ax1 = fig.add_subplot(121)
-ax2 = fig.add_subplot(122)
-for ii in cluster3_list:
-    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
-    ax1.set_xlabel('Time [10min]',fontsize=10)
-    ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
-
-    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
-    ax2.set_xlabel('Time [10min]',fontsize=10)
-    ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
-    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
-    
-fig = plt.figure(figsize=small_fig_size)
-ax1 = fig.add_subplot(121)
-ax2 = fig.add_subplot(122)
-for ii in cluster4_list:
-    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
-    ax1.set_xlabel('Time [10min]',fontsize=10)
-    ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
-
-    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
-    ax2.set_xlabel('Time [10min]',fontsize=10)
-    ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
-    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
-    
-fig = plt.figure(figsize=small_fig_size)
-ax1 = fig.add_subplot(121)
-ax2 = fig.add_subplot(122)
-for ii in cluster5_list:
-    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
-    ax1.set_xlabel('Time [10min]',fontsize=10)
-    ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
-
-    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
-    ax2.set_xlabel('Time [10min]',fontsize=10)
-    ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
-    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
 #%% save the clusters
-with open('cluster1.txt', 'w') as f:
-    for item in cluster1_list:
-        f.write("%s\n" % item)
-        
-with open('cluster2.txt', 'w') as f:
-    for item in cluster2_list:
-        f.write("%s\n" % item)
-        
-with open('cluster3.txt', 'w') as f:
-    for item in cluster3_list:
-        f.write("%s\n" % item)
-        
-with open('cluster4.txt', 'w') as f:
-    for item in cluster4_list:
-        f.write("%s\n" % item)
-        
-with open('cluster5.txt', 'w') as f:
-    for item in cluster5_list:
-        f.write("%s\n" % item)
+try:
+    os.remove('clusterList.txt')
+except:
+    pass
+for i in range(num_clusters):
+    with open('clusterList.txt', 'a') as f:
+        for item in cluster_list[i]:
+            f.write("%s " % item)
+        f.write("\n")

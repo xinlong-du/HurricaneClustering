@@ -358,22 +358,26 @@ def elbow_sil_graph(SSE,sil,file_name):
     fig = plt.figure(figsize=(8, 3))
     
     # plot elbow graph
+    k = np.linspace(1,20,20)
     ax = fig.add_subplot(121)
     ax.xaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
     ax.xaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
     ax.yaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
     ax.yaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
-    ax.plot(SSE,'-g',linewidth=plt_line_width,label='Ground Truth')
+    plt.xticks(np.arange(0, 21, 2))
+    ax.plot(k, SSE,'-g',linewidth=plt_line_width,label='Ground Truth',marker='x')
     ax.set_xlabel('k value')
     ax.set_ylabel('WSS')
     
     # plot silhouette graph
+    k = np.linspace(2,20,19)
     ax = fig.add_subplot(122)
     ax.xaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
     ax.xaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
     ax.yaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
     ax.yaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
-    ax.plot(sil,'--c',linewidth=plt_line_width,label='Reconstruction')
+    plt.xticks(np.arange(0, 21, 2))
+    ax.plot(k,sil,'--c',linewidth=plt_line_width,label='Reconstruction',marker='x')
     # Add the x and y-axis labels
     ax.set_xlabel('k value')
     ax.set_ylabel('Silhouette Score')
