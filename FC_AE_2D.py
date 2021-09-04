@@ -492,5 +492,5 @@ except:
 for i in range(num_clusters):
     with open('clusterList.txt', 'a') as f:
         for item in cluster_list[i]:
-            f.write("%s " % item)
+            f.write("%s\t" % item)
         f.write("\n")
