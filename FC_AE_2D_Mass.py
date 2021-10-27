@@ -49,7 +49,7 @@ class FNN_AE(nn.Module):
         super(FNN_AE, self).__init__()
 
         ################################ SYNTHETIC DATABASE AARCHITECTURE #####
-        input_dim = 308
+        input_dim = 492
         # nn.Linear(in_features, out_features)
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, 128),
@@ -90,7 +90,7 @@ class ground_motion_data():
     
         # load files
         x=[]
-        file_name = 'hurricaneRecords2Dto1Dramp.txt'
+        file_name = './windRecordsMass/windRecords2Dto1DrampGrid1.txt'
         spectra = np.loadtxt(file_name)
         x = np.delete(spectra,0,0)
         num_GM = len(spectra[0,:])
@@ -269,7 +269,7 @@ if __name__ == '__main__':
     os.chdir(folder_path) # change directory  
     
     # load files and create dictionaries
-    file_name = 'hurricaneID2D.txt'
+    file_name = './windRecordsMass/hurricaneIDsGrid1.txt'
     RSN_read = open(file_name,"r")
     RSN_list = [int(line[:-1]) for line in RSN_read]
     
@@ -288,7 +288,7 @@ if __name__ == '__main__':
     
     # load scaled spectra data
     scaled_spectra = []
-    file_name = 'hurricaneRecords2Dto1Dramp.txt'
+    file_name = './windRecordsMass/windRecords2Dto1DrampGrid1.txt'
     scaled_spectra = np.loadtxt(file_name)
     
     end = len(scaled_spectra-1)
@@ -302,7 +302,7 @@ if __name__ == '__main__':
     
     #%%########################### TRAIN MODEL ###############################
     # change output folder path
-    folder_path = './figures'
+    folder_path = './windRecordsMass'
     try:
         os.makedirs(folder_path)
     except:
@@ -408,7 +408,7 @@ if __name__ == '__main__':
     zip_iterator = zip(np_test_latents_RSN, np_cluster_ids_x)
     ID_dict_discovered = dict(zip_iterator)
     #%%############################ CREATE PLOTS #############################        
-    T = np.linspace(0,307,308)
+    T = np.linspace(0,491,492)
     test_latent_list = torch.load('test_latent_list.pt',map_location=torch.device('cpu'))
     
     # plot training loss
@@ -434,8 +434,8 @@ if __name__ == '__main__':
 import matplotlib.pyplot as plt
 small_fig_size = (9,3)
 plt_line_width = 0.8
-T2 = np.linspace(0,153,154)
-for ii in range(len(np_test_inputs)-185):
+T2 = np.linspace(0,245,246)
+for ii in range(len(np_test_inputs)-135):
     fig = plt.figure(figsize=small_fig_size)
     ax = fig.add_subplot(121)
     line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
@@ -453,7 +453,7 @@ for ii in range(len(np_test_inputs)-185):
     plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
     plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
 #%%
-for ii in range(len(np_test_inputs)-185):
+for ii in range(len(np_test_inputs)-135):
     fig = plt.figure(figsize=small_fig_size)
     ax = fig.add_axes([0, 0, 1, 1])
     line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
@@ -486,11 +486,11 @@ for i in range(num_clusters):
 
 #%% save the clusters
 try:
-    os.remove('clusterList.txt')
+    os.remove('clusterListGrid1.txt')
 except:
     pass
 for i in range(num_clusters):
-    with open('clusterList.txt', 'a') as f:
+    with open('clusterListGrid1.txt', 'a') as f:
         for item in cluster_list[i]:
             f.write("%s\t" % item)
         f.write("\n")
