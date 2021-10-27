@@ -395,7 +395,7 @@ if __name__ == '__main__':
     #%%######################### K-MEANS Clustering ##########################
     x = test_latents.cpu()
     SSE,sil = get_SSE_and_sil(np_latent_features)
-    num_clusters = 4
+    num_clusters = 5
     # k-means cluster
     cluster_ids_x, cluster_centers = kmeans(
         X=x, num_clusters=num_clusters, distance='euclidean', device=torch.device('cpu') ) 
