@@ -19,7 +19,7 @@ plt_line_width = 0.8
 small_fig_size = (4,3)
 big_fig_size = (6,5)
 
-def loss_plot(x,print_every):
+def loss_plot(x,print_every,file_name):
 
     fig = plt.figure(figsize=small_fig_size)
     ax = fig.add_axes([0, 0, 1, 1])
@@ -35,7 +35,7 @@ def loss_plot(x,print_every):
     ax.set_xlabel('Number of Epochs x' + str(print_every))
     ax.set_ylabel('Training Loss')
     # Save figure
-    plt.savefig('./train_loss.svg', transparent=False, bbox_inches='tight')
+    plt.savefig('./'+file_name+'.svg', transparent=False, bbox_inches='tight')
 
 def spectra_plot(spectra,T,file_name):
     fig = plt.figure(figsize=small_fig_size)

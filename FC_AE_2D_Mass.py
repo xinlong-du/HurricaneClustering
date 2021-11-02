@@ -203,13 +203,13 @@ def save_model(model):
         Save the trained model.
         You can change the model name 
     '''
-    torch.save(model.state_dict(), './AE_FC_model_GM.pt')
+    torch.save(model.state_dict(), './Grid1_AE_FC_model_GM.pt')
 
 def load_model(model):
     '''
         load the trained model.
     '''
-    model.load_state_dict(torch.load('./AE_FC_model_GM.pt'))
+    model.load_state_dict(torch.load('./Grid1_AE_FC_model_GM.pt'))
     
 def load_file_num(file_name,RSN_list):
     
@@ -302,7 +302,7 @@ if __name__ == '__main__':
     
     #%%########################### TRAIN MODEL ###############################
     # change output folder path
-    folder_path = './windRecordsMass'
+    folder_path = './figures'
     try:
         os.makedirs(folder_path)
     except:
@@ -339,27 +339,27 @@ if __name__ == '__main__':
     test_latent_list = [test_latents,test_latents_RSN]
     
     # save tensors
-    torch.save(train_loss_list, './train_loss_list.pt')
-    torch.save(train_tensor, './train_tensor.pt')
-    torch.save(test_outputs, './test_outputs.pt')
-    torch.save(test_inputs, './test_inputs.pt')
-    torch.save(test_latent_list, './test_latent_list.pt')
+    torch.save(train_loss_list, './Grid1_train_loss_list.pt')
+    torch.save(train_tensor, './Grid1_train_tensor.pt')
+    torch.save(test_outputs, './Grid1_test_outputs.pt')
+    torch.save(test_inputs, './Grid1_test_inputs.pt')
+    torch.save(test_latent_list, './Grid1_test_latent_list.pt')
     
     # save dictionaries    
-    a_file = open("ID_dict_gt.pkl", "wb")
+    a_file = open("Grid1_ID_dict_gt.pkl", "wb")
     pickle.dump(ID_dict_gt, a_file)
     a_file.close()
 
-    a_file = open("Sa_dictionary.pkl", "wb")
+    a_file = open("Grid1_Sa_dictionary.pkl", "wb")
     pickle.dump(Sa_dictionary, a_file)
     a_file.close()  
     
     #%%############## POST PROCESS ###########################################
     # download tensors
-    test_latent_list = torch.load('test_latent_list.pt')
-    test_outputs = torch.load('test_outputs.pt')
-    test_inputs = torch.load('test_inputs.pt')
-    train_loss_list = torch.load('train_loss_list.pt')
+    test_latent_list = torch.load('Grid1_test_latent_list.pt')
+    test_outputs = torch.load('Grid1_test_outputs.pt')
+    test_inputs = torch.load('Grid1_test_inputs.pt')
+    train_loss_list = torch.load('Grid1_train_loss_list.pt')
     
     test_latents = test_latent_list[0]
     test_latents_RSN = test_latent_list[1]
@@ -370,11 +370,11 @@ if __name__ == '__main__':
     np_test_latents_RSN = test_latents_RSN.cpu().detach().numpy()
     
     # download dictionaries
-    a_file = open("ID_dict_gt.pkl", "rb")
+    a_file = open("Grid1_ID_dict_gt.pkl", "rb")
     ID_dict_gt = pickle.load(a_file)
     a_file.close()
     
-    a_file = open("Sa_dictionary.pkl", "rb")
+    a_file = open("Grid1_Sa_dictionary.pkl", "rb")
     Sa_dictionary = pickle.load(a_file)
     a_file.close()
     
@@ -409,22 +409,22 @@ if __name__ == '__main__':
     ID_dict_discovered = dict(zip_iterator)
     #%%############################ CREATE PLOTS #############################        
     T = np.linspace(0,491,492)
-    test_latent_list = torch.load('test_latent_list.pt',map_location=torch.device('cpu'))
+    test_latent_list = torch.load('Grid1_test_latent_list.pt',map_location=torch.device('cpu'))
     
     # plot training loss
-    loss_plot(train_loss_list[1:],print_every)
+    loss_plot(train_loss_list[1:],print_every,'Grid1_train_loss')
     
     # plot input spectral groups
-    wind_plot(np_test_inputs,T,'inputs')
+    wind_plot(np_test_inputs,T,'Grid1_inputs')
     
     # plot output {reconstructed} spectral groups
-    wind_plot(np_test_outputs,T,'reconstructed_outputs')
+    wind_plot(np_test_outputs,T,'Grid1_reconstructed_outputs')
     
     # plot difference from input and output
-    wind_plot_difference(np_test_inputs-np_test_outputs,T,'reconstruction_difference')
+    wind_plot_difference(np_test_inputs-np_test_outputs,T,'Grid1_reconstruction_difference')
     
     # plot shilloette score and elbow graph
-    elbow_sil_graph(SSE,sil,'elbow_sil_graph')
+    elbow_sil_graph(SSE,sil,'Grid1_elbow_sil_graph')
     
     # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,np_latent_features,[0,1,2],'Latent Features ','Ground Truth Clusters','LF_3D_gt',num_clusters)
     # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,principalComponents_latents,[0,1,2],'Principal Comp. ','Ground Truth Clusters','PC_3D_gt',num_clusters)
@@ -460,8 +460,8 @@ for ii in range(len(np_test_inputs)-135):
     ax.set_xlabel('Time [10min]')
     ax.set_ylabel('Wind Speed. [m/s]')                        
 #%% plot latent features clustered using K-means
-Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','LF123')
-Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','LF345')
+Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid1_LF123')
+Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid1_LF345')
 #%% plot wind records for different clusters
 cluster_list=[[] for _ in range(num_clusters)]
 for i in range(len(test_latents_RSN)):
@@ -485,6 +485,14 @@ for i in range(num_clusters):
         ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
 
 #%% save the clusters
+# change output folder path
+    folder_path = '../windRecordsMass'
+    try:
+        os.makedirs(folder_path)
+    except:
+        pass
+    os.chdir(folder_path) # change directory 
+    
 try:
     os.remove('clusterListGrid1.txt')
 except:
