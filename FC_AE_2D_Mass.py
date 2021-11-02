@@ -12,6 +12,8 @@ from torch.optim import lr_scheduler
 import os
 import numpy as np
 import time
+import copy
+
 # for PCA
 from sklearn.decomposition import PCA
 import pandas as pd
@@ -396,7 +398,10 @@ if __name__ == '__main__':
         #%%######################### K-MEANS Clustering ##########################
         x = test_latents.cpu()
         SSE,sil = get_SSE_and_sil(np_latent_features)
-        num_clusters = max(range(len(sil)), key=sil.__getitem__)+2
+        sil2=copy.deepcopy(sil)
+        sil2[0]=0.0
+        sil2[1]=0.0
+        num_clusters = max(range(len(sil2)), key=sil2.__getitem__)+2
         # k-means cluster
         cluster_ids_x, cluster_centers = kmeans(
             X=x, num_clusters=num_clusters, distance='euclidean', device=torch.device('cpu') ) 
