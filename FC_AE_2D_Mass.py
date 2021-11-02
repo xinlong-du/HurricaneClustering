@@ -49,7 +49,7 @@ class FNN_AE(nn.Module):
         super(FNN_AE, self).__init__()
 
         ################################ SYNTHETIC DATABASE AARCHITECTURE #####
-        input_dim = 492
+        input_dim = len(spectra[0])
         # nn.Linear(in_features, out_features)
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, 128),
@@ -90,7 +90,7 @@ class ground_motion_data():
     
         # load files
         x=[]
-        file_name = './windRecordsMass/windRecords2Dto1DrampGrid1.txt'
+        file_name = './windRecordsMass/windRecords2Dto1DrampGrid'+str(gridID)+'.txt'
         spectra = np.loadtxt(file_name)
         x = np.delete(spectra,0,0)
         num_GM = len(spectra[0,:])
@@ -484,7 +484,7 @@ if __name__ == '__main__':
                 line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
                 ax2.set_xlabel('Time [10min]',fontsize=10)
                 ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-            plt.savefig('./Grid'+str(gridID)+'Cluster'+str(i)+'windRecords.svg', transparent=False, bbox_inches='tight')
+            plt.savefig('./Grid'+str(gridID)+'Cluster'+str(i+1)+'windRecords.svg', transparent=False, bbox_inches='tight')
 
         #%% save the clusters
         # change output folder path
