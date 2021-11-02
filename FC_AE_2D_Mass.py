@@ -264,7 +264,7 @@ if __name__ == '__main__':
     LF = 5
     BATCH_SIZE = 16
     #%%####################### DOWNLOAD DATA #################################
-    for gridID in range(1,3):
+    for gridID in range(1,93):
         #  data folder path
         folder_path = 'C:\\D\\CRISP\\Hurricane Catalog\\HurricaneClustering\\data'
         os.chdir(folder_path) # change directory  
@@ -436,33 +436,33 @@ if __name__ == '__main__':
         small_fig_size = (9,3)
         plt_line_width = 0.8
         T2 = np.linspace(0,len(spectra[0])//2-1,len(spectra[0])//2)
-        for ii in range(10):
-            fig = plt.figure(figsize=small_fig_size)
-            ax = fig.add_subplot(121)
-            line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
-            line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
-            ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
-            ax.set_xlabel('Time [10min]',fontsize=10)
-            ax.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+        # for ii in range(10):
+        #     fig = plt.figure(figsize=small_fig_size)
+        #     ax = fig.add_subplot(121)
+        #     line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
+        #     line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
+        #     ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
+        #     ax.set_xlabel('Time [10min]',fontsize=10)
+        #     ax.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
                 
-            ax = fig.add_subplot(122)
-            line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
-            line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
-            ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
-            ax.set_xlabel('Time [10min]',fontsize=10)
-            ax.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-            plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
-            plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
-        #%%
-        for ii in range(10):
-            fig = plt.figure(figsize=small_fig_size)
-            ax = fig.add_axes([0, 0, 1, 1])
-            line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
-            ax.set_xlabel('Time [10min]')
-            ax.set_ylabel('Wind Speed. [m/s]')                        
-        #%% plot latent features clustered using K-means
-        Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid'+str(gridID)+'_LF123')
-        Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid'+str(gridID)+'_LF345')
+        #     ax = fig.add_subplot(122)
+        #     line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
+        #     line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
+        #     ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
+        #     ax.set_xlabel('Time [10min]',fontsize=10)
+        #     ax.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+        #     plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+        #     plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+        # #%%
+        # for ii in range(10):
+        #     fig = plt.figure(figsize=small_fig_size)
+        #     ax = fig.add_axes([0, 0, 1, 1])
+        #     line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
+        #     ax.set_xlabel('Time [10min]')
+        #     ax.set_ylabel('Wind Speed. [m/s]')                        
+        # #%% plot latent features clustered using K-means
+        # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid'+str(gridID)+'_LF123')
+        # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid'+str(gridID)+'_LF345')
         #%% plot wind records for different clusters
         cluster_list=[[] for _ in range(num_clusters)]
         for i in range(len(test_latents_RSN)):
