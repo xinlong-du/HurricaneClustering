@@ -203,13 +203,13 @@ def save_model(model):
         Save the trained model.
         You can change the model name 
     '''
-    torch.save(model.state_dict(), './Grid1_AE_FC_model_GM.pt')
+    torch.save(model.state_dict(), './Grid'+str(gridID)+'_AE_FC_model_GM.pt')
 
 def load_model(model):
     '''
         load the trained model.
     '''
-    model.load_state_dict(torch.load('./Grid1_AE_FC_model_GM.pt'))
+    model.load_state_dict(torch.load('./Grid'+str(gridID)+'_AE_FC_model_GM.pt'))
     
 def load_file_num(file_name,RSN_list):
     
@@ -264,241 +264,243 @@ if __name__ == '__main__':
     LF = 5
     BATCH_SIZE = 16
     #%%####################### DOWNLOAD DATA #################################
-    #  data folder path
-    folder_path = './data'
-    os.chdir(folder_path) # change directory  
+    for gridID in range(1,3):
+        #  data folder path
+        folder_path = 'C:\\D\\CRISP\\Hurricane Catalog\\HurricaneClustering\\data'
+        os.chdir(folder_path) # change directory  
     
-    # load files and create dictionaries
-    file_name = './windRecordsMass/hurricaneIDsGrid1.txt'
-    RSN_read = open(file_name,"r")
-    RSN_list = [int(line[:-1]) for line in RSN_read]
-    
-    file_name = 'Ordered_mag_005.txt'
-    ID_dict_gt = load_file_num(file_name,RSN_list)
-    ID_dict_gt = {key:val for key, val in ID_dict_gt.items() if val > 0}
-    
-    Dataset = ground_motion_data(RSN_list)
-    num_batches =  len(Dataset)// BATCH_SIZE
-    
-    train_tensor = torch.utils.data.DataLoader(Dataset, batch_size = BATCH_SIZE,
-    shuffle=True, num_workers=0,drop_last=True) 
-     
-    dataiter = iter(train_tensor)
-    inputs, label = dataiter.next()
-    
-    # load scaled spectra data
-    scaled_spectra = []
-    file_name = './windRecordsMass/windRecords2Dto1DrampGrid1.txt'
-    scaled_spectra = np.loadtxt(file_name)
-    
-    end = len(scaled_spectra-1)
-    RSN = scaled_spectra[0]
-    spectra = scaled_spectra[1:end]
-    spectra = np.transpose(spectra,(1,0))
-
-    # create dictionary
-    zip_iterator = zip(RSN, spectra)
-    Sa_dictionary = dict(zip_iterator) 
-    
-    #%%########################### TRAIN MODEL ###############################
-    # change output folder path
-    folder_path = './figures'
-    try:
-        os.makedirs(folder_path)
-    except:
-        pass
-    os.chdir(folder_path) # change directory 
-
-    # initialize the autoencoder model
-    model = FNN_AE().cuda()
-
-    start = time.time()
-    # train the model
-    train_loss_list = train(train_tensor, model, num_epochs, learning_rate,
-        print_every)
-    end = time.time()
-    
-    print("The running time:", (end-start)/60, "min")
-    # evaluate the prediction performance
-    test_output_list, test_latent_list, test_input_list = postprocess(train_tensor)
-    
-    # combine all of the batches to single tensor
-    test_outputs = test_output_list[0]
-    for i in range(num_batches-1):
-        test_outputs = torch.cat((test_outputs,test_output_list[i+1]))
+        # load files and create dictionaries
+        file_name = './windRecordsMass/hurricaneIDsGrid'+str(gridID)+'.txt'
+        RSN_read = open(file_name,"r")
+        RSN_list = [int(line[:-1]) for line in RSN_read]
         
-    test_inputs = test_input_list[0]
-    for i in range(num_batches-1):
-        test_inputs = torch.cat((test_inputs,test_input_list[i+1]))
-        test_latents = test_latent_list[0][0]
-    
-    test_latents_RSN = test_latent_list[0][1]
-    for i in range(num_batches-1):
-        test_latents = torch.cat((test_latents,test_latent_list[i+1][0]))
-        test_latents_RSN = torch.cat((test_latents_RSN,test_latent_list[i+1][1]))
-    test_latent_list = [test_latents,test_latents_RSN]
-    
-    # save tensors
-    torch.save(train_loss_list, './Grid1_train_loss_list.pt')
-    torch.save(train_tensor, './Grid1_train_tensor.pt')
-    torch.save(test_outputs, './Grid1_test_outputs.pt')
-    torch.save(test_inputs, './Grid1_test_inputs.pt')
-    torch.save(test_latent_list, './Grid1_test_latent_list.pt')
-    
-    # save dictionaries    
-    a_file = open("Grid1_ID_dict_gt.pkl", "wb")
-    pickle.dump(ID_dict_gt, a_file)
-    a_file.close()
-
-    a_file = open("Grid1_Sa_dictionary.pkl", "wb")
-    pickle.dump(Sa_dictionary, a_file)
-    a_file.close()  
-    
-    #%%############## POST PROCESS ###########################################
-    # download tensors
-    test_latent_list = torch.load('Grid1_test_latent_list.pt')
-    test_outputs = torch.load('Grid1_test_outputs.pt')
-    test_inputs = torch.load('Grid1_test_inputs.pt')
-    train_loss_list = torch.load('Grid1_train_loss_list.pt')
-    
-    test_latents = test_latent_list[0]
-    test_latents_RSN = test_latent_list[1]
+        file_name = 'Ordered_mag_005.txt'
+        ID_dict_gt = load_file_num(file_name,RSN_list)
+        ID_dict_gt = {key:val for key, val in ID_dict_gt.items() if val > 0}
         
-    np_test_outputs = test_outputs.cpu().detach().numpy()
-    np_test_inputs = test_inputs.cpu().detach().numpy()
-    np_latent_features = test_latents.cpu().detach().numpy()
-    np_test_latents_RSN = test_latents_RSN.cpu().detach().numpy()
-    
-    # download dictionaries
-    a_file = open("Grid1_ID_dict_gt.pkl", "rb")
-    ID_dict_gt = pickle.load(a_file)
-    a_file.close()
-    
-    a_file = open("Grid1_Sa_dictionary.pkl", "rb")
-    Sa_dictionary = pickle.load(a_file)
-    a_file.close()
-    
-    #%%############################# PCA #####################################    
-    # Perform PCA on the latent features
-    feat_cols = ['feature'+str(i) for i in range(np_latent_features.shape[1])]
-    normalised_latents = pd.DataFrame(np_latent_features,columns=feat_cols)
-    normalised_latents.tail()
-    
-    pca_latents = PCA(n_components=3)
-    principalComponents_latents = pca_latents.fit_transform(np_latent_features)
-
-    principal_breast_Df = pd.DataFrame(data = principalComponents_latents
-             , columns = ['principal component 1', 'principal component 2','principal component 3'])
-    
-    print('Explained variation per principal component: {}'.format(pca_latents.explained_variance_ratio_))
-    
-    #%%######################### K-MEANS Clustering ##########################
-    x = test_latents.cpu()
-    SSE,sil = get_SSE_and_sil(np_latent_features)
-    num_clusters = 5
-    # k-means cluster
-    cluster_ids_x, cluster_centers = kmeans(
-        X=x, num_clusters=num_clusters, distance='euclidean', device=torch.device('cpu') ) 
-    
-    # convert discovered IDs to numpy and correct scaling
-    np_cluster_ids_x = cluster_ids_x.tolist()
-    np_cluster_ids_x = [x + 1 for x in np_cluster_ids_x]
-    
-    # create cluster ID dictionary
-    zip_iterator = zip(np_test_latents_RSN, np_cluster_ids_x)
-    ID_dict_discovered = dict(zip_iterator)
-    #%%############################ CREATE PLOTS #############################        
-    T = np.linspace(0,491,492)
-    test_latent_list = torch.load('Grid1_test_latent_list.pt',map_location=torch.device('cpu'))
-    
-    # plot training loss
-    loss_plot(train_loss_list[1:],print_every,'Grid1_train_loss')
-    
-    # plot input spectral groups
-    wind_plot(np_test_inputs,T,'Grid1_inputs')
-    
-    # plot output {reconstructed} spectral groups
-    wind_plot(np_test_outputs,T,'Grid1_reconstructed_outputs')
-    
-    # plot difference from input and output
-    wind_plot_difference(np_test_inputs-np_test_outputs,T,'Grid1_reconstruction_difference')
-    
-    # plot shilloette score and elbow graph
-    elbow_sil_graph(SSE,sil,'Grid1_elbow_sil_graph')
-    
-    # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,np_latent_features,[0,1,2],'Latent Features ','Ground Truth Clusters','LF_3D_gt',num_clusters)
-    # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,principalComponents_latents,[0,1,2],'Principal Comp. ','Ground Truth Clusters','PC_3D_gt',num_clusters)
-    # Discrete_3D_scatter(test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'Principal Comp. ','Discovered Clusters','PC_3D_discovered',num_clusters)
-    
-#%%
-import matplotlib.pyplot as plt
-small_fig_size = (9,3)
-plt_line_width = 0.8
-T2 = np.linspace(0,245,246)
-for ii in range(len(np_test_inputs)-135):
-    fig = plt.figure(figsize=small_fig_size)
-    ax = fig.add_subplot(121)
-    line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
-    line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
-    ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
-    ax.set_xlabel('Time [10min]',fontsize=10)
-    ax.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+        Dataset = ground_motion_data(RSN_list)
+        num_batches =  len(Dataset)// BATCH_SIZE
         
-    ax = fig.add_subplot(122)
-    line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
-    line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
-    ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
-    ax.set_xlabel('Time [10min]',fontsize=10)
-    ax.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
-    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
-#%%
-for ii in range(len(np_test_inputs)-135):
-    fig = plt.figure(figsize=small_fig_size)
-    ax = fig.add_axes([0, 0, 1, 1])
-    line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
-    ax.set_xlabel('Time [10min]')
-    ax.set_ylabel('Wind Speed. [m/s]')                        
-#%% plot latent features clustered using K-means
-Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid1_LF123')
-Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid1_LF345')
-#%% plot wind records for different clusters
-cluster_list=[[] for _ in range(num_clusters)]
-for i in range(len(test_latents_RSN)):
-    for ii in range(num_clusters):
-        if ID_dict_discovered[int(test_latents_RSN[i])]==ii+1:
-            cluster_list[ii].append(int(test_latents_RSN[i]))
-
-for i in range(num_clusters):
-    fig = plt.figure(figsize=small_fig_size)
-    ax1 = fig.add_subplot(121)
-    ax2 = fig.add_subplot(122)
-    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
-    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
-    for ii in cluster_list[i]:
-        line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
-        ax1.set_xlabel('Time [10min]',fontsize=10)
-        ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
-
-        line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
-        ax2.set_xlabel('Time [10min]',fontsize=10)
-        ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-
-#%% save the clusters
-# change output folder path
-    folder_path = '../windRecordsMass'
-    try:
-        os.makedirs(folder_path)
-    except:
-        pass
-    os.chdir(folder_path) # change directory 
+        train_tensor = torch.utils.data.DataLoader(Dataset, batch_size = BATCH_SIZE,
+        shuffle=True, num_workers=0,drop_last=True) 
+         
+        dataiter = iter(train_tensor)
+        inputs, label = dataiter.next()
+        
+        # load scaled spectra data
+        scaled_spectra = []
+        file_name = './windRecordsMass/windRecords2Dto1DrampGrid'+str(gridID)+'.txt'
+        scaled_spectra = np.loadtxt(file_name)
+        
+        end = len(scaled_spectra-1)
+        RSN = scaled_spectra[0]
+        spectra = scaled_spectra[1:end]
+        spectra = np.transpose(spectra,(1,0))
     
-try:
-    os.remove('clusterListGrid1.txt')
-except:
-    pass
-for i in range(num_clusters):
-    with open('clusterListGrid1.txt', 'a') as f:
-        for item in cluster_list[i]:
-            f.write("%s\t" % item)
-        f.write("\n")
+        # create dictionary
+        zip_iterator = zip(RSN, spectra)
+        Sa_dictionary = dict(zip_iterator) 
+    
+        #%%########################### TRAIN MODEL ###############################
+        # change output folder path
+        folder_path = './figures'
+        try:
+            os.makedirs(folder_path)
+        except:
+            pass
+        os.chdir(folder_path) # change directory 
+    
+        # initialize the autoencoder model
+        model = FNN_AE().cuda()
+    
+        start = time.time()
+        # train the model
+        train_loss_list = train(train_tensor, model, num_epochs, learning_rate,
+            print_every)
+        end = time.time()
+        
+        print("The running time:", (end-start)/60, "min")
+        # evaluate the prediction performance
+        test_output_list, test_latent_list, test_input_list = postprocess(train_tensor)
+        
+        # combine all of the batches to single tensor
+        test_outputs = test_output_list[0]
+        for i in range(num_batches-1):
+            test_outputs = torch.cat((test_outputs,test_output_list[i+1]))
+            
+        test_inputs = test_input_list[0]
+        for i in range(num_batches-1):
+            test_inputs = torch.cat((test_inputs,test_input_list[i+1]))
+            test_latents = test_latent_list[0][0]
+        
+        test_latents_RSN = test_latent_list[0][1]
+        for i in range(num_batches-1):
+            test_latents = torch.cat((test_latents,test_latent_list[i+1][0]))
+            test_latents_RSN = torch.cat((test_latents_RSN,test_latent_list[i+1][1]))
+        test_latent_list = [test_latents,test_latents_RSN]
+        
+        # save tensors
+        torch.save(train_loss_list, './Grid'+str(gridID)+'_train_loss_list.pt')
+        torch.save(train_tensor, './Grid'+str(gridID)+'_train_tensor.pt')
+        torch.save(test_outputs, './Grid'+str(gridID)+'_test_outputs.pt')
+        torch.save(test_inputs, './Grid'+str(gridID)+'_test_inputs.pt')
+        torch.save(test_latent_list, './Grid'+str(gridID)+'_test_latent_list.pt')
+        
+        # save dictionaries    
+        a_file = open('Grid'+str(gridID)+'_ID_dict_gt.pkl', "wb")
+        pickle.dump(ID_dict_gt, a_file)
+        a_file.close()
+    
+        a_file = open('Grid'+str(gridID)+'_Sa_dictionary.pkl', "wb")
+        pickle.dump(Sa_dictionary, a_file)
+        a_file.close()  
+        
+        #%%############## POST PROCESS ###########################################
+        # download tensors
+        test_latent_list = torch.load('Grid'+str(gridID)+'_test_latent_list.pt')
+        test_outputs = torch.load('Grid'+str(gridID)+'_test_outputs.pt')
+        test_inputs = torch.load('Grid'+str(gridID)+'_test_inputs.pt')
+        train_loss_list = torch.load('Grid'+str(gridID)+'_train_loss_list.pt')
+        
+        test_latents = test_latent_list[0]
+        test_latents_RSN = test_latent_list[1]
+            
+        np_test_outputs = test_outputs.cpu().detach().numpy()
+        np_test_inputs = test_inputs.cpu().detach().numpy()
+        np_latent_features = test_latents.cpu().detach().numpy()
+        np_test_latents_RSN = test_latents_RSN.cpu().detach().numpy()
+        
+        # download dictionaries
+        a_file = open('Grid'+str(gridID)+'_ID_dict_gt.pkl', "rb")
+        ID_dict_gt = pickle.load(a_file)
+        a_file.close()
+        
+        a_file = open('Grid'+str(gridID)+'_Sa_dictionary.pkl', "rb")
+        Sa_dictionary = pickle.load(a_file)
+        a_file.close()
+        
+        #%%############################# PCA #####################################    
+        # Perform PCA on the latent features
+        feat_cols = ['feature'+str(i) for i in range(np_latent_features.shape[1])]
+        normalised_latents = pd.DataFrame(np_latent_features,columns=feat_cols)
+        normalised_latents.tail()
+        
+        pca_latents = PCA(n_components=3)
+        principalComponents_latents = pca_latents.fit_transform(np_latent_features)
+    
+        principal_breast_Df = pd.DataFrame(data = principalComponents_latents
+                 , columns = ['principal component 1', 'principal component 2','principal component 3'])
+        
+        print('Explained variation per principal component: {}'.format(pca_latents.explained_variance_ratio_))
+        
+        #%%######################### K-MEANS Clustering ##########################
+        x = test_latents.cpu()
+        SSE,sil = get_SSE_and_sil(np_latent_features)
+        num_clusters = max(range(len(sil)), key=sil.__getitem__)+2
+        # k-means cluster
+        cluster_ids_x, cluster_centers = kmeans(
+            X=x, num_clusters=num_clusters, distance='euclidean', device=torch.device('cpu') ) 
+        
+        # convert discovered IDs to numpy and correct scaling
+        np_cluster_ids_x = cluster_ids_x.tolist()
+        np_cluster_ids_x = [x + 1 for x in np_cluster_ids_x]
+        
+        # create cluster ID dictionary
+        zip_iterator = zip(np_test_latents_RSN, np_cluster_ids_x)
+        ID_dict_discovered = dict(zip_iterator)
+        #%%############################ CREATE PLOTS #############################        
+        T = np.linspace(0,len(spectra[0])-1,len(spectra[0]))
+        test_latent_list = torch.load('Grid'+str(gridID)+'_test_latent_list.pt',map_location=torch.device('cpu'))
+        
+        # plot training loss
+        loss_plot(train_loss_list[1:],print_every,'Grid'+str(gridID)+'_train_loss')
+        
+        # plot input spectral groups
+        wind_plot(np_test_inputs,T,'Grid'+str(gridID)+'_inputs')
+        
+        # plot output {reconstructed} spectral groups
+        wind_plot(np_test_outputs,T,'Grid'+str(gridID)+'_reconstructed_outputs')
+        
+        # plot difference from input and output
+        wind_plot_difference(np_test_inputs-np_test_outputs,T,'Grid'+str(gridID)+'_reconstruction_difference')
+        
+        # plot shilloette score and elbow graph
+        elbow_sil_graph(SSE,sil,'Grid'+str(gridID)+'_elbow_sil_graph')
+        
+        # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,np_latent_features,[0,1,2],'Latent Features ','Ground Truth Clusters','LF_3D_gt',num_clusters)
+        # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,principalComponents_latents,[0,1,2],'Principal Comp. ','Ground Truth Clusters','PC_3D_gt',num_clusters)
+        # Discrete_3D_scatter(test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'Principal Comp. ','Discovered Clusters','PC_3D_discovered',num_clusters)
+        
+        #%%
+        import matplotlib.pyplot as plt
+        small_fig_size = (9,3)
+        plt_line_width = 0.8
+        T2 = np.linspace(0,len(spectra[0])//2-1,len(spectra[0])//2)
+        for ii in range(10):
+            fig = plt.figure(figsize=small_fig_size)
+            ax = fig.add_subplot(121)
+            line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
+            line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
+            ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
+            ax.set_xlabel('Time [10min]',fontsize=10)
+            ax.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+                
+            ax = fig.add_subplot(122)
+            line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
+            line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
+            ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
+            ax.set_xlabel('Time [10min]',fontsize=10)
+            ax.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+            plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+            plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+        #%%
+        for ii in range(10):
+            fig = plt.figure(figsize=small_fig_size)
+            ax = fig.add_axes([0, 0, 1, 1])
+            line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
+            ax.set_xlabel('Time [10min]')
+            ax.set_ylabel('Wind Speed. [m/s]')                        
+        #%% plot latent features clustered using K-means
+        Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid'+str(gridID)+'_LF123')
+        Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid'+str(gridID)+'_LF345')
+        #%% plot wind records for different clusters
+        cluster_list=[[] for _ in range(num_clusters)]
+        for i in range(len(test_latents_RSN)):
+            for ii in range(num_clusters):
+                if ID_dict_discovered[int(test_latents_RSN[i])]==ii+1:
+                    cluster_list[ii].append(int(test_latents_RSN[i]))
+        
+        for i in range(num_clusters):
+            fig = plt.figure(figsize=small_fig_size)
+            ax1 = fig.add_subplot(121)
+            ax2 = fig.add_subplot(122)
+            plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+            plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+            for ii in cluster_list[i]:
+                line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
+                ax1.set_xlabel('Time [10min]',fontsize=10)
+                ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+        
+                line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
+                ax2.set_xlabel('Time [10min]',fontsize=10)
+                ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+            plt.savefig('./Grid'+str(gridID)+'Cluster'+str(i)+'windRecords.svg', transparent=False, bbox_inches='tight')
+
+        #%% save the clusters
+        # change output folder path
+        folder_path = '../windRecordsMass'
+        try:
+            os.makedirs(folder_path)
+        except:
+            pass
+        os.chdir(folder_path) # change directory 
+    
+        try:
+            os.remove('clusterListGrid'+str(gridID)+'.txt')
+        except:
+            pass
+        for i in range(num_clusters):
+            with open('clusterListGrid'+str(gridID)+'.txt', 'a') as f:
+                for item in cluster_list[i]:
+                    f.write("%s\t" % item)
+                f.write("\n")
