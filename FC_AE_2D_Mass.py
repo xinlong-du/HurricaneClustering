@@ -268,7 +268,7 @@ if __name__ == '__main__':
     #%%####################### DOWNLOAD DATA #################################
     for gridID in range(1,93):
         #  data folder path
-        folder_path = 'C:\\D\\CRISP\\Hurricane Catalog\\HurricaneClustering\\data'
+        folder_path = 'C:\\Users\\xinlo\\OneDrive - Northeastern University\\CRISP\\Repositories\\Hurricane Catalog\\HurricaneClustering\\data'
         os.chdir(folder_path) # change directory  
     
         # load files and create dictionaries
