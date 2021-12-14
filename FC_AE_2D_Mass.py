@@ -39,10 +39,6 @@ from sklearn.metrics import silhouette_score
 # define a GPU usage
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'  # CPU:-1; GPU0: 1; GPU1: 0;
 
-# define a random seed
-np.random.seed(123)
-torch.manual_seed(123)
-
 class FNN_AE(nn.Module):
     '''
         General Auto-Encoder framework for fully-connected neural networs.    
@@ -267,6 +263,9 @@ if __name__ == '__main__':
     BATCH_SIZE = 16
     #%%####################### DOWNLOAD DATA #################################
     for gridID in range(1,93):
+        # define a random seed
+        np.random.seed(123)
+        torch.manual_seed(123)
         #  data folder path
         folder_path = 'C:\\Users\\xinlo\\OneDrive - Northeastern University\\CRISP\\Repositories\\Hurricane Catalog\\HurricaneClustering\\data'
         os.chdir(folder_path) # change directory  
