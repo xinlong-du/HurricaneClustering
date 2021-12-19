@@ -91,6 +91,7 @@ class ground_motion_data():
         file_name = './windRecordsMass/windRecords2Dto1DrampGrid'+str(gridID)+'.txt'
         spectra = np.loadtxt(file_name)
         x = np.delete(spectra,0,0)
+        x = (x-np.min(x))/(np.max(x)-np.min(x))
         num_GM = len(spectra[0,:])
         for GM in range(0,num_GM):
             spec = torch.tensor(x[:,GM],dtype = torch.float32)
@@ -201,13 +202,13 @@ def save_model(model):
         Save the trained model.
         You can change the model name 
     '''
-    torch.save(model.state_dict(), './Grid'+str(gridID)+'_AE_FC_model_GM.pt')
+    torch.save(model.state_dict(), './NormGrid'+str(gridID)+'_AE_FC_model_GM.pt')
 
 def load_model(model):
     '''
         load the trained model.
     '''
-    model.load_state_dict(torch.load('./Grid'+str(gridID)+'_AE_FC_model_GM.pt'))
+    model.load_state_dict(torch.load('./NormGrid'+str(gridID)+'_AE_FC_model_GM.pt'))
     
 def load_file_num(file_name,RSN_list):
     
@@ -262,7 +263,7 @@ if __name__ == '__main__':
     LF = 5
     BATCH_SIZE = 16
     #%%####################### DOWNLOAD DATA #################################
-    for gridID in range(1,93):
+    for gridID in range(86,87):
         # define a random seed
         np.random.seed(123)
         torch.manual_seed(123)
@@ -296,6 +297,7 @@ if __name__ == '__main__':
         end = len(scaled_spectra-1)
         RSN = scaled_spectra[0]
         spectra = scaled_spectra[1:end]
+        spectra = (spectra-np.min(spectra))/(np.max(spectra)-np.min(spectra))
         spectra = np.transpose(spectra,(1,0))
     
         # create dictionary
@@ -341,27 +343,27 @@ if __name__ == '__main__':
         test_latent_list = [test_latents,test_latents_RSN]
         
         # save tensors
-        torch.save(train_loss_list, './Grid'+str(gridID)+'_train_loss_list.pt')
-        torch.save(train_tensor, './Grid'+str(gridID)+'_train_tensor.pt')
-        torch.save(test_outputs, './Grid'+str(gridID)+'_test_outputs.pt')
-        torch.save(test_inputs, './Grid'+str(gridID)+'_test_inputs.pt')
-        torch.save(test_latent_list, './Grid'+str(gridID)+'_test_latent_list.pt')
+        torch.save(train_loss_list, './NormGrid'+str(gridID)+'_train_loss_list.pt')
+        torch.save(train_tensor, './NormGrid'+str(gridID)+'_train_tensor.pt')
+        torch.save(test_outputs, './NormGrid'+str(gridID)+'_test_outputs.pt')
+        torch.save(test_inputs, './NormGrid'+str(gridID)+'_test_inputs.pt')
+        torch.save(test_latent_list, './NormGrid'+str(gridID)+'_test_latent_list.pt')
         
         # save dictionaries    
-        a_file = open('Grid'+str(gridID)+'_ID_dict_gt.pkl', "wb")
+        a_file = open('NormGrid'+str(gridID)+'_ID_dict_gt.pkl', "wb")
         pickle.dump(ID_dict_gt, a_file)
         a_file.close()
     
-        a_file = open('Grid'+str(gridID)+'_Sa_dictionary.pkl', "wb")
+        a_file = open('NormGrid'+str(gridID)+'_Sa_dictionary.pkl', "wb")
         pickle.dump(Sa_dictionary, a_file)
         a_file.close()  
         
         #%%############## POST PROCESS ###########################################
         # download tensors
-        test_latent_list = torch.load('Grid'+str(gridID)+'_test_latent_list.pt')
-        test_outputs = torch.load('Grid'+str(gridID)+'_test_outputs.pt')
-        test_inputs = torch.load('Grid'+str(gridID)+'_test_inputs.pt')
-        train_loss_list = torch.load('Grid'+str(gridID)+'_train_loss_list.pt')
+        test_latent_list = torch.load('NormGrid'+str(gridID)+'_test_latent_list.pt')
+        test_outputs = torch.load('NormGrid'+str(gridID)+'_test_outputs.pt')
+        test_inputs = torch.load('NormGrid'+str(gridID)+'_test_inputs.pt')
+        train_loss_list = torch.load('NormGrid'+str(gridID)+'_train_loss_list.pt')
         
         test_latents = test_latent_list[0]
         test_latents_RSN = test_latent_list[1]
@@ -372,11 +374,11 @@ if __name__ == '__main__':
         np_test_latents_RSN = test_latents_RSN.cpu().detach().numpy()
         
         # download dictionaries
-        a_file = open('Grid'+str(gridID)+'_ID_dict_gt.pkl', "rb")
+        a_file = open('NormGrid'+str(gridID)+'_ID_dict_gt.pkl', "rb")
         ID_dict_gt = pickle.load(a_file)
         a_file.close()
         
-        a_file = open('Grid'+str(gridID)+'_Sa_dictionary.pkl', "rb")
+        a_file = open('NormGrid'+str(gridID)+'_Sa_dictionary.pkl', "rb")
         Sa_dictionary = pickle.load(a_file)
         a_file.close()
         
@@ -414,22 +416,25 @@ if __name__ == '__main__':
         ID_dict_discovered = dict(zip_iterator)
         #%%############################ CREATE PLOTS #############################        
         T = np.linspace(0,len(spectra[0])-1,len(spectra[0]))
-        test_latent_list = torch.load('Grid'+str(gridID)+'_test_latent_list.pt',map_location=torch.device('cpu'))
+        test_latent_list = torch.load('NormGrid'+str(gridID)+'_test_latent_list.pt',map_location=torch.device('cpu'))
+        np_test_inputs = np_test_inputs*(np.max(scaled_spectra[1:])-np.min(scaled_spectra[1:]))+np.min(scaled_spectra[1:])
+        np_test_outputs = np_test_outputs*(np.max(scaled_spectra[1:])-np.min(scaled_spectra[1:]))+np.min(scaled_spectra[1:])
+        spectra = spectra*(np.max(scaled_spectra[1:])-np.min(scaled_spectra[1:]))+np.min(scaled_spectra[1:])
         
         # plot training loss
-        loss_plot(train_loss_list[1:],print_every,'Grid'+str(gridID)+'_train_loss')
+        loss_plot(train_loss_list[1:],print_every,'NormGrid'+str(gridID)+'_train_loss')
         
         # plot input spectral groups
-        wind_plot(np_test_inputs,T,'Grid'+str(gridID)+'_inputs')
+        wind_plot(np_test_inputs,T,'NormGrid'+str(gridID)+'_inputs')
         
         # plot output {reconstructed} spectral groups
-        wind_plot(np_test_outputs,T,'Grid'+str(gridID)+'_reconstructed_outputs')
+        wind_plot(np_test_outputs,T,'NormGrid'+str(gridID)+'_reconstructed_outputs')
         
         # plot difference from input and output
-        wind_plot_difference(np_test_inputs-np_test_outputs,T,'Grid'+str(gridID)+'_reconstruction_difference')
+        wind_plot_difference(np_test_inputs-np_test_outputs,T,'NormGrid'+str(gridID)+'_reconstruction_difference')
         
         # plot shilloette score and elbow graph
-        elbow_sil_graph(SSE,sil,'Grid'+str(gridID)+'_elbow_sil_graph')
+        elbow_sil_graph(SSE,sil,'NormGrid'+str(gridID)+'_elbow_sil_graph')
         
         # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,np_latent_features,[0,1,2],'Latent Features ','Ground Truth Clusters','LF_3D_gt',num_clusters)
         # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,principalComponents_latents,[0,1,2],'Principal Comp. ','Ground Truth Clusters','PC_3D_gt',num_clusters)
@@ -440,33 +445,33 @@ if __name__ == '__main__':
         small_fig_size = (9,3)
         plt_line_width = 0.8
         T2 = np.linspace(0,len(spectra[0])//2-1,len(spectra[0])//2)
-        # for ii in range(10):
-        #     fig = plt.figure(figsize=small_fig_size)
-        #     ax = fig.add_subplot(121)
-        #     line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
-        #     line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
-        #     ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
-        #     ax.set_xlabel('Time [10min]',fontsize=10)
-        #     ax.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+        for ii in range(10):
+            fig = plt.figure(figsize=small_fig_size)
+            ax = fig.add_subplot(121)
+            line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
+            line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
+            ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
+            ax.set_xlabel('Time [10min]',fontsize=10)
+            ax.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
                 
-        #     ax = fig.add_subplot(122)
-        #     line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
-        #     line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
-        #     ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
-        #     ax.set_xlabel('Time [10min]',fontsize=10)
-        #     ax.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-        #     plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
-        #     plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
-        # #%%
-        # for ii in range(10):
-        #     fig = plt.figure(figsize=small_fig_size)
-        #     ax = fig.add_axes([0, 0, 1, 1])
-        #     line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
-        #     ax.set_xlabel('Time [10min]')
-        #     ax.set_ylabel('Wind Speed. [m/s]')                        
-        # #%% plot latent features clustered using K-means
-        # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid'+str(gridID)+'_LF123')
-        # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid'+str(gridID)+'_LF345')
+            ax = fig.add_subplot(122)
+            line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
+            line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
+            ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
+            ax.set_xlabel('Time [10min]',fontsize=10)
+            ax.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
+            plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+            plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+        #%%
+        for ii in range(10):
+            fig = plt.figure(figsize=small_fig_size)
+            ax = fig.add_axes([0, 0, 1, 1])
+            line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
+            ax.set_xlabel('Time [10min]')
+            ax.set_ylabel('Wind Speed. [m/s]')                        
+        #%% plot latent features clustered using K-means
+        Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','NormGrid'+str(gridID)+'_LF123')
+        Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','NormGrid'+str(gridID)+'_LF345')
         #%% plot wind records for different clusters
         cluster_list=[[] for _ in range(num_clusters)]
         for i in range(len(test_latents_RSN)):
@@ -488,7 +493,7 @@ if __name__ == '__main__':
                 line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
                 ax2.set_xlabel('Time [10min]',fontsize=10)
                 ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-            plt.savefig('./Grid'+str(gridID)+'Cluster'+str(i+1)+'windRecords.svg', transparent=False, bbox_inches='tight')
+            plt.savefig('./NormGrid'+str(gridID)+'Cluster'+str(i+1)+'windRecords.svg', transparent=False, bbox_inches='tight')
 
         #%% save the clusters
         # change output folder path
@@ -500,11 +505,11 @@ if __name__ == '__main__':
         os.chdir(folder_path) # change directory 
     
         try:
-            os.remove('clusterListGrid'+str(gridID)+'.txt')
+            os.remove('clusterListNormGrid'+str(gridID)+'.txt')
         except:
             pass
         for i in range(num_clusters):
-            with open('clusterListGrid'+str(gridID)+'.txt', 'a') as f:
+            with open('clusterListNormGrid'+str(gridID)+'.txt', 'a') as f:
                 for item in cluster_list[i]:
                     f.write("%s\t" % item)
                 f.write("\n")
