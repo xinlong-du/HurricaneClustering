@@ -262,7 +262,7 @@ if __name__ == '__main__':
     LF = 5
     BATCH_SIZE = 16
     #%%####################### DOWNLOAD DATA #################################
-    for gridID in range(1,93):
+    for gridID in range(86,87):
         # define a random seed
         np.random.seed(123)
         torch.manual_seed(123)
@@ -430,10 +430,10 @@ if __name__ == '__main__':
         
         # plot shilloette score and elbow graph
         elbow_sil_graph(SSE,sil,'Grid'+str(gridID)+'_elbow_sil_graph')
-        
+        #%%
         # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,np_latent_features,[0,1,2],'Latent Features ','Ground Truth Clusters','LF_3D_gt',num_clusters)
         # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,principalComponents_latents,[0,1,2],'Principal Comp. ','Ground Truth Clusters','PC_3D_gt',num_clusters)
-        # Discrete_3D_scatter(test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'Principal Comp. ','Discovered Clusters','PC_3D_discovered',num_clusters)
+        Discrete_3D_scatter(test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'Principal Comp. ','Cluster','Grid'+str(gridID)+'_PC_3D',num_clusters)
         
         #%%
         import matplotlib.pyplot as plt
@@ -467,6 +467,9 @@ if __name__ == '__main__':
         # #%% plot latent features clustered using K-means
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid'+str(gridID)+'_LF123')
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid'+str(gridID)+'_LF345')
+        
+        #%% plot principal components clusted using k-means
+        Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'PC','Cluster','Grid'+str(gridID)+'_PC123')
         #%% plot wind records for different clusters
         cluster_list=[[] for _ in range(num_clusters)]
         for i in range(len(test_latents_RSN)):
