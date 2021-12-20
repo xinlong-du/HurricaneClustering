@@ -492,6 +492,23 @@ if __name__ == '__main__':
                 ax2.set_xlabel('Time [10min]',fontsize=10)
                 ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
             plt.savefig('./Grid'+str(gridID)+'Cluster'+str(i+1)+'windRecords.svg', transparent=False, bbox_inches='tight')
+            
+        #%% select records from each cluster based on the distance to the centroid
+        np_cluster_centers = cluster_centers.cpu().detach().numpy()
+        np_distances = np.zeros(shape=(len(np_latent_features),num_clusters))
+        for i in range(num_clusters):
+            for j in range(len(np_latent_features)):
+                np_distances[j,i] = np.linalg.norm(np_cluster_centers[i,:]-np_latent_features[j,:])
+        
+        clusters_distance = []
+        for i in range(num_clusters):
+            one_cluster_dist = np.zeros(shape=(len(cluster_list[i]),2))
+            for j in range(len(cluster_list[i])):
+                one_cluster_dist[j,0] = cluster_list[i][j]
+                idx = np.where(np_test_latents_RSN == cluster_list[i][j])
+                one_cluster_dist[j,1] = np_distances[idx[0][0],i]
+            one_cluster_dist_sorted = one_cluster_dist[one_cluster_dist[:, 1].argsort()]
+            clusters_distance.append(one_cluster_dist_sorted)
 
         #%% save the clusters
         # change output folder path
