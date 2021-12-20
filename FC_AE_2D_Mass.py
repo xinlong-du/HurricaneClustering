@@ -413,17 +413,21 @@ if __name__ == '__main__':
         zip_iterator = zip(np_test_latents_RSN, np_cluster_ids_x)
         ID_dict_discovered = dict(zip_iterator)
         #%%############################ CREATE PLOTS #############################        
+        import matplotlib.pyplot as plt
+        small_fig_size = (4,4)
+        plt_line_width = 0.5
+        plt_line_width_thick = 1.5 
+        T2 = np.linspace(0,len(spectra[0])//2-1,len(spectra[0])//2)
         T = np.linspace(0,len(spectra[0])-1,len(spectra[0]))
-        test_latent_list = torch.load('Grid'+str(gridID)+'_test_latent_list.pt',map_location=torch.device('cpu'))
         
         # plot training loss
         loss_plot(train_loss_list[1:],print_every,'Grid'+str(gridID)+'_train_loss')
         
         # plot input spectral groups
-        wind_plot(np_test_inputs,T,'Grid'+str(gridID)+'_inputs')
+        wind_plot(np_test_inputs,T2,'Grid'+str(gridID)+'_inputs')
         
         # plot output {reconstructed} spectral groups
-        wind_plot(np_test_outputs,T,'Grid'+str(gridID)+'_reconstructed_outputs')
+        wind_plot(np_test_outputs,T2,'Grid'+str(gridID)+'_reconstructed_outputs')
         
         # plot difference from input and output
         wind_plot_difference(np_test_inputs-np_test_outputs,T,'Grid'+str(gridID)+'_reconstruction_difference')
@@ -436,35 +440,51 @@ if __name__ == '__main__':
         Discrete_3D_scatter(test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'Principal Comp. ','Cluster','Grid'+str(gridID)+'_PC_3D',num_clusters)
         
         #%%
-        import matplotlib.pyplot as plt
-        small_fig_size = (4,4)
-        plt_line_width = 0.5
-        plt_line_width_thick = 1.5 
-        T2 = np.linspace(0,len(spectra[0])//2-1,len(spectra[0])//2)
-        # for ii in range(10):
-        #     fig = plt.figure(figsize=small_fig_size)
-        #     ax = fig.add_subplot(121)
-        #     line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
-        #     line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
-        #     ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
-        #     ax.set_xlabel('Time [10min]',fontsize=10)
-        #     ax.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
+        for ii in range(10):
+            fig = plt.figure(figsize=small_fig_size)
+            ax = fig.add_subplot(211)
+            plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+            plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+            ax.tick_params(direction="in")
+            line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
+            line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
+            ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 9})
+            # ax.set_xlabel('Time (10min)',fontsize=9)
+            ax.set_ylabel('Wind speed in North dir. (m/s)',fontsize=9)
                 
-        #     ax = fig.add_subplot(122)
-        #     line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
-        #     line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
-        #     ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 10})
-        #     ax.set_xlabel('Time [10min]',fontsize=10)
-        #     ax.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-        #     plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
-        #     plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
-        # #%%
-        # for ii in range(10):
-        #     fig = plt.figure(figsize=small_fig_size)
-        #     ax = fig.add_axes([0, 0, 1, 1])
-        #     line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
-        #     ax.set_xlabel('Time [10min]')
-        #     ax.set_ylabel('Wind Speed. [m/s]')                        
+            ax = fig.add_subplot(212)
+            plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+            plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+            ax.tick_params(direction="in")
+            line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
+            line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
+            ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': 9})
+            ax.set_xlabel('Time (10min)',fontsize=9)
+            ax.set_ylabel('Wind speed in East dir. (m/s)',fontsize=9)
+            plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+            plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+        
+        for ii in range(10):
+            fig = plt.figure(figsize=small_fig_size)
+            ax = fig.add_axes([0, 0, 1, 1])
+            plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+            plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+            ax.tick_params(direction="in")
+            line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
+            ax.set_xlabel('Time (10min)',fontsize=9)
+            ax.set_ylabel('Wind speed difference (m/s)',fontsize=9)
+        #%% plot error
+        error=abs(np_test_inputs-np_test_outputs)
+        error=error.flatten() 
+        weights = np.ones_like(error) / len(error)
+        fig = plt.figure(figsize=small_fig_size)
+        ax = fig.add_axes([0, 0, 1, 1])
+        plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+        plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+        ax.tick_params(direction="in")
+        plt.hist(error, weights=weights, bins=30)  # density=False would make counts
+        plt.ylabel('Probability')
+        plt.xlabel('Error (m/s)');                   
         # #%% plot latent features clustered using K-means
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid'+str(gridID)+'_LF123')
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid'+str(gridID)+'_LF345')
