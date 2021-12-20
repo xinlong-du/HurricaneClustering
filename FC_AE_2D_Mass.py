@@ -437,8 +437,9 @@ if __name__ == '__main__':
         
         #%%
         import matplotlib.pyplot as plt
-        small_fig_size = (9,3)
-        plt_line_width = 0.8
+        small_fig_size = (4,4)
+        plt_line_width = 0.5
+        plt_line_width_thick = 1.5 
         T2 = np.linspace(0,len(spectra[0])//2-1,len(spectra[0])//2)
         # for ii in range(10):
         #     fig = plt.figure(figsize=small_fig_size)
@@ -468,32 +469,15 @@ if __name__ == '__main__':
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid'+str(gridID)+'_LF123')
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid'+str(gridID)+'_LF345')
         
-        #%% plot principal components clusted using k-means
-        Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'PC','Cluster','Grid'+str(gridID)+'_PC123')
-        #%% plot wind records for different clusters
+        # #%% plot principal components clusted using k-means
+        # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'PC','Cluster','Grid'+str(gridID)+'_PC123')
+        #%% select records from each cluster based on the distance to the centroid
         cluster_list=[[] for _ in range(num_clusters)]
         for i in range(len(test_latents_RSN)):
             for ii in range(num_clusters):
                 if ID_dict_discovered[int(test_latents_RSN[i])]==ii+1:
                     cluster_list[ii].append(int(test_latents_RSN[i]))
         
-        for i in range(num_clusters):
-            fig = plt.figure(figsize=small_fig_size)
-            ax1 = fig.add_subplot(121)
-            ax2 = fig.add_subplot(122)
-            plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
-            plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
-            for ii in cluster_list[i]:
-                line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width)    
-                ax1.set_xlabel('Time [10min]',fontsize=10)
-                ax1.set_ylabel('Wind Speed in North [m/s]',fontsize=10)
-        
-                line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width)
-                ax2.set_xlabel('Time [10min]',fontsize=10)
-                ax2.set_ylabel('Wind Speed in East [m/s]',fontsize=10)
-            plt.savefig('./Grid'+str(gridID)+'Cluster'+str(i+1)+'windRecords.svg', transparent=False, bbox_inches='tight')
-            
-        #%% select records from each cluster based on the distance to the centroid
         np_cluster_centers = cluster_centers.cpu().detach().numpy()
         np_distances = np.zeros(shape=(len(np_latent_features),num_clusters))
         for i in range(num_clusters):
@@ -509,6 +493,37 @@ if __name__ == '__main__':
                 one_cluster_dist[j,1] = np_distances[idx[0][0],i]
             one_cluster_dist_sorted = one_cluster_dist[one_cluster_dist[:, 1].argsort()]
             clusters_distance.append(one_cluster_dist_sorted)
+            
+        cluster_list_sele=[[] for _ in range(num_clusters)]
+        for i in range(num_clusters):
+            nSele=round(len(cluster_list[i])/10)
+            for j in range(nSele):
+                cluster_list_sele[i].append(int(clusters_distance[i][j,0]))
+                
+        #%% plot wind records for different clusters
+        for i in range(num_clusters):
+            fig = plt.figure(figsize=small_fig_size)
+            ax1 = fig.add_subplot(211)
+            ax2 = fig.add_subplot(212)
+            plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
+            plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+            ax1.tick_params(direction="in")
+            ax2.tick_params(direction="in")
+            for ii in cluster_list[i]:
+                if ii in cluster_list_sele[i]:
+                    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width_thick)
+                else:
+                    line_ori,=ax1.plot(T2,spectra[ii-1,0:len(spectra[0])//2], linewidth=plt_line_width, linestyle='dashed')    
+                # ax1.set_xlabel('Time (10min)',fontsize=9)
+                ax1.set_ylabel('Wind speed in North dir. (m/s)',fontsize=9)
+                
+                if ii in cluster_list_sele[i]:
+                    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width_thick)
+                else:
+                    line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width, linestyle='dashed')
+                ax2.set_xlabel('Time (10min)',fontsize=9)
+                ax2.set_ylabel('Wind speed in East dir. (m/s)',fontsize=9)
+            plt.savefig('./Grid'+str(gridID)+'Cluster'+str(i+1)+'windRecords.svg', transparent=False, bbox_inches='tight')
 
         #%% save the clusters
         # change output folder path
@@ -526,5 +541,15 @@ if __name__ == '__main__':
         for i in range(num_clusters):
             with open('clusterListGrid'+str(gridID)+'.txt', 'a') as f:
                 for item in cluster_list[i]:
+                    f.write("%s\t" % item)
+                f.write("\n")
+        
+        try:
+            os.remove('clusterListSeleGrid'+str(gridID)+'.txt')
+        except:
+            pass
+        for i in range(num_clusters):
+            with open('clusterListSeleGrid'+str(gridID)+'.txt', 'a') as f:
+                for item in cluster_list_sele[i]:
                     f.write("%s\t" % item)
                 f.write("\n")
