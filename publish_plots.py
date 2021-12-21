@@ -16,8 +16,9 @@ tick_mj_sz = 5
 tick_mn_sz = 2
 plt_line_width = 0.8
 
-small_fig_size = (4,3)
+small_fig_size = (3.5,3.5)
 big_fig_size = (6,5)
+fig_font_size = 8
 
 def loss_plot(x,print_every,file_name):
 
@@ -1257,13 +1258,12 @@ def plot_sample_spectra_from_latent_space(test_latents_RSN,ID_dict_discovered,pr
     plt.savefig('./scaled_means_'+file_name+'_'+str(i)+'.svg', transparent=True, bbox_inches='tight')
     
 def wind_plot(spectra,T,file_name):
-    small_fig_size = (4,4)
     plt_line_width = 0.5
     fig = plt.figure(figsize=small_fig_size)
     ax1 = fig.add_subplot(211)
     ax2 = fig.add_subplot(212)
-    plt.rc('xtick', labelsize=9)    # fontsize of the tick labels
-    plt.rc('ytick', labelsize=9)    # fontsize of the tick labels
+    plt.rc('xtick', labelsize=fig_font_size)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=fig_font_size)    # fontsize of the tick labels
     ax1.xaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
     ax1.xaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
     ax1.yaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
@@ -1290,9 +1290,9 @@ def wind_plot(spectra,T,file_name):
         ax1.plot(T,spectra[ii,0:len(spectra[0])//2], linewidth=plt_line_width)
         ax2.plot(T,spectra[ii,len(spectra[0])//2:], linewidth=plt_line_width)
     # Add the x and y-axis labels
-    ax2.set_xlabel('Time (10min)',fontsize=9)
-    ax1.set_ylabel('Wind speed in North dir. (m/s)',fontsize=9)
-    ax2.set_ylabel('Wind speed in East dir. (m/s)',fontsize=9)
+    ax2.set_xlabel('Time (min)',fontsize=fig_font_size)
+    ax1.set_ylabel('Wind speed in North dir. (m/s)',fontsize=fig_font_size)
+    ax2.set_ylabel('Wind speed in East dir. (m/s)',fontsize=fig_font_size)
     # Save figure
     plt.savefig('./'+file_name+'.svg', transparent=True, bbox_inches='tight')
     
@@ -1320,7 +1320,7 @@ def wind_plot_difference(spectra,T,file_name):
     for ii in range(len(spectra)):
         ax.plot(T,spectra[ii,:], linewidth=plt_line_width)
     # Add the x and y-axis labels
-    ax.set_xlabel('Time [10min]')
+    ax.set_xlabel('Time [min]')
     ax.set_ylabel('Wind Speed [m/s]')
     # Save figure
     plt.savefig('./'+file_name+'.svg', transparent=True, bbox_inches='tight')
