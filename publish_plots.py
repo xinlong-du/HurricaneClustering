@@ -1294,7 +1294,7 @@ def wind_plot(spectra,T,file_name):
     ax1.set_ylabel('Wind speed in North dir. (m/s)',fontsize=fig_font_size)
     ax2.set_ylabel('Wind speed in East dir. (m/s)',fontsize=fig_font_size)
     # Save figure
-    plt.savefig('./'+file_name+'.svg', transparent=True, bbox_inches='tight')
+    plt.savefig('./'+file_name+'.jpg', transparent=True, bbox_inches='tight', dpi=500)
     
 def wind_plot_difference(spectra,T,file_name):
     fig = plt.figure(figsize=small_fig_size)

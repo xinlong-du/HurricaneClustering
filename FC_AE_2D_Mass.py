@@ -415,6 +415,7 @@ if __name__ == '__main__':
         #%%############################ CREATE PLOTS #############################        
         import matplotlib.pyplot as plt
         small_fig_size = (3.5,3.5)
+        small_fig_size2 = (3.5,3.0)
         plt_line_width = 0.5
         plt_line_width_thick = 1.5 
         fig_font_size = 8
@@ -478,14 +479,17 @@ if __name__ == '__main__':
         error=abs(np_test_inputs-np_test_outputs)
         error=error.flatten() 
         weights = np.ones_like(error) / len(error)
-        fig = plt.figure(figsize=small_fig_size)
+        fig = plt.figure(figsize=small_fig_size2)
         ax = fig.add_axes([0, 0, 1, 1])
         plt.rc('xtick', labelsize=fig_font_size)    # fontsize of the tick labels
         plt.rc('ytick', labelsize=fig_font_size)    # fontsize of the tick labels
         ax.tick_params(direction="in")
-        plt.hist(error, weights=weights, bins=30)  # density=False would make counts
-        plt.ylabel('Probability')
-        plt.xlabel('Error (m/s)');                   
+        (nErr, binsErr, patchesErr) = plt.hist(error, weights=weights, bins=26, facecolor="None", edgecolor="k")  # density=False would make counts
+        plt.ylabel('Probability',fontsize=fig_font_size)
+        plt.xlabel('Reconstruction error (m/s)',fontsize=fig_font_size);
+        ax.set_xlim(0.0, 6)
+        file_name = 'Grid'+str(gridID)+'_error_hist'
+        plt.savefig('./'+file_name+'.jpg', transparent=True, bbox_inches='tight', dpi=1000)                   
         # #%% plot latent features clustered using K-means
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid'+str(gridID)+'_LF123')
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid'+str(gridID)+'_LF345')
@@ -544,7 +548,7 @@ if __name__ == '__main__':
                     line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width, linestyle='dashed')
                 ax2.set_xlabel('Time (min)',fontsize=fig_font_size)
                 ax2.set_ylabel('Wind speed in East dir. (m/s)',fontsize=fig_font_size)
-            plt.savefig('./Grid'+str(gridID)+'Cluster'+str(i+1)+'windRecords.svg', transparent=False, bbox_inches='tight')
+            plt.savefig('./Grid'+str(gridID)+'Cluster'+str(i+1)+'windRecords.jpg', transparent=False, bbox_inches='tight', dpi=500)
 
         #%% save the clusters
         # change output folder path
