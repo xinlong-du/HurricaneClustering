@@ -26,6 +26,7 @@ from publish_plots import loss_plot
 from publish_plots import spectra_plot
 from publish_plots import spectra_plot_difference
 from publish_plots import elbow_sil_graph
+from publish_plots import elbow_graph
 from publish_plots import Discrete_3D_scatter
 from publish_plots import wind_plot
 from publish_plots import wind_plot_difference
@@ -397,10 +398,17 @@ if __name__ == '__main__':
         #%%######################### K-MEANS Clustering ##########################
         x = test_latents.cpu()
         SSE,sil = get_SSE_and_sil(np_latent_features)
-        sil2=copy.deepcopy(sil)
-        sil2[0]=0.0
-        sil2[1]=0.0
-        num_clusters = max(range(len(sil2)), key=sil2.__getitem__)+2
+        # sil2=copy.deepcopy(sil)
+        # sil2[0]=0.0
+        # sil2[1]=0.0
+        # num_clusters = max(range(len(sil2)), key=sil2.__getitem__)+2
+        
+        # load scaled spectra data
+        num_clusters_grids = []
+        file_name = '../../assets/numClusters.txt'
+        num_clusters_grids = np.loadtxt(file_name)
+        num_clusters = int(num_clusters_grids[gridID-1])
+        
         # k-means cluster
         cluster_ids_x, cluster_centers = kmeans(
             X=x, num_clusters=num_clusters, distance='euclidean', device=torch.device('cpu') ) 
@@ -436,6 +444,7 @@ if __name__ == '__main__':
         
         # plot shilloette score and elbow graph
         elbow_sil_graph(SSE,sil,'Grid'+str(gridID)+'_elbow_sil_graph')
+        elbow_graph(SSE,sil,'Grid'+str(gridID)+'_elbow_graph')
         #%%
         # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,np_latent_features,[0,1,2],'Latent Features ','Ground Truth Clusters','LF_3D_gt',num_clusters)
         # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,principalComponents_latents,[0,1,2],'Principal Comp. ','Ground Truth Clusters','PC_3D_gt',num_clusters)

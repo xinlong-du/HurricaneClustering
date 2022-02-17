@@ -12,8 +12,8 @@ mpl.rcParams['font.family'] = 'Times New Roman'
 plt.rcParams['font.size'] = 18
 plt.rcParams['axes.linewidth'] = 1
 tick_width = 1
-tick_mj_sz = 5
-tick_mn_sz = 2
+tick_mj_sz = 2
+tick_mn_sz = 1
 plt_line_width = 0.8
 
 small_fig_size = (3.5,3.5)
@@ -385,6 +385,25 @@ def elbow_sil_graph(SSE,sil,file_name):
     # Save figure
     plt.tight_layout()
     plt.savefig('./'+file_name+'.svg', transparent=True, bbox_inches='tight')
+
+def elbow_graph(SSE,sil,file_name):
+    fig = plt.figure(figsize=small_fig_size)
+    
+    # plot elbow graph
+    k = np.linspace(1,20,20)
+    ax = fig.add_axes([0, 0, 1, 1])
+    plt.rc('xtick', labelsize=fig_font_size)    # fontsize of the tick labels
+    plt.rc('ytick', labelsize=fig_font_size)    # fontsize of the tick labels
+    ax.xaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
+    ax.xaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
+    ax.yaxis.set_tick_params(which='major', size=tick_mj_sz, width=tick_width, direction='in')
+    ax.yaxis.set_tick_params(which='minor', size=tick_mn_sz, width=tick_width, direction='in')
+    plt.xticks(np.arange(0, 21, 2))
+    ax.plot(k, SSE,'-k',linewidth=plt_line_width,label='Ground Truth',marker='x')
+    ax.set_xlabel('k value',fontsize=fig_font_size)
+    ax.set_ylabel('WSS',fontsize=fig_font_size)
+    # Save figure
+    plt.savefig('./'+file_name+'.jpg', transparent=True, bbox_inches='tight', dpi=500)
     
 def elbow_sil_graph_synthetic(SSE,sil,file_name):
     fig = plt.figure(figsize=(8, 3))
