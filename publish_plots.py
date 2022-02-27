@@ -323,37 +323,37 @@ def Discrete_3D_scatter(test_latents_RSN,dictionary,latents,latent_feature_plot,
     zmin, zmax = ax1.get_zlim()
     
     axis_list = [xmin,xmax,ymin,ymax,zmin,zmax]
-    fig = plt.figure(figsize=(6,4))
-    ax1 = fig.add_subplot(111,projection='3d')
-    cbar=fig.colorbar(p,ticks=range(num_clusters+1), label=cb_label,pad = 0.2)
-    cbar.set_label(label=cb_label,fontsize=fig_font_size)
+    # fig = plt.figure(figsize=(6,4))
+    # ax1 = fig.add_subplot(111,projection='3d')
+    # cbar=fig.colorbar(p,ticks=range(num_clusters+1), label=cb_label,pad = 0.2)
+    # cbar.set_label(label=cb_label,fontsize=fig_font_size)
     
-    def init():
-        if num_clusters == 2:
-            ax1.scatter(
-                new_LF[:, latent_feature_plot[0]], new_LF[:, latent_feature_plot[1]], new_LF[:, latent_feature_plot[2]],
-                c=static_attribute_list, 
-                cmap=plt.cm.get_cmap(color_name, num_clusters),vmin=0.5,vmax=num_clusters+0.5)
-        else:
-            ax1.scatter(
-                new_LF[:, latent_feature_plot[0]], new_LF[:, latent_feature_plot[1]], new_LF[:, latent_feature_plot[2]],
-                c=static_attribute_list, 
-                cmap=plt.cm.get_cmap(color_name, num_clusters),vmin=0.5,vmax=num_clusters+0.5)
-        ax1.set_xlabel(axis_label+str(latent_feature_plot[0]+1),labelpad=0.2,fontsize=fig_font_size)
-        ax1.set_ylabel(axis_label+str(latent_feature_plot[1]+1),labelpad=0.2,fontsize=fig_font_size)
-        ax1.set_zlabel(axis_label+str(latent_feature_plot[2]+1),labelpad=0.2,fontsize=fig_font_size)
-        return fig,
+    # def init():
+    #     if num_clusters == 2:
+    #         ax1.scatter(
+    #             new_LF[:, latent_feature_plot[0]], new_LF[:, latent_feature_plot[1]], new_LF[:, latent_feature_plot[2]],
+    #             c=static_attribute_list, 
+    #             cmap=plt.cm.get_cmap(color_name, num_clusters),vmin=0.5,vmax=num_clusters+0.5)
+    #     else:
+    #         ax1.scatter(
+    #             new_LF[:, latent_feature_plot[0]], new_LF[:, latent_feature_plot[1]], new_LF[:, latent_feature_plot[2]],
+    #             c=static_attribute_list, 
+    #             cmap=plt.cm.get_cmap(color_name, num_clusters),vmin=0.5,vmax=num_clusters+0.5)
+    #     ax1.set_xlabel(axis_label+str(latent_feature_plot[0]+1),labelpad=0.2,fontsize=fig_font_size)
+    #     ax1.set_ylabel(axis_label+str(latent_feature_plot[1]+1),labelpad=0.2,fontsize=fig_font_size)
+    #     ax1.set_zlabel(axis_label+str(latent_feature_plot[2]+1),labelpad=0.2,fontsize=fig_font_size)
+    #     return fig,
     
-    def animate(i):
-        ax1.view_init(elev=20., azim=0.2*i)
-        ax1.xaxis.pane.fill = False
-        ax1.yaxis.pane.fill = False
-        ax1.zaxis.pane.fill = False
-        ax1.grid(False)
-        return fig,
+    # def animate(i):
+    #     ax1.view_init(elev=20., azim=0.2*i)
+    #     ax1.xaxis.pane.fill = False
+    #     ax1.yaxis.pane.fill = False
+    #     ax1.zaxis.pane.fill = False
+    #     ax1.grid(False)
+    #     return fig,
     
-    anim = FuncAnimation(fig, animate, init_func=init, frames=np.arange(0, 1080, 2), repeat=True)
-    anim.save('./'+fig_name+'.gif', dpi=300, writer='PillowWriter', fps=12) 
+    # anim = FuncAnimation(fig, animate, init_func=init, frames=np.arange(0, 1080, 2), repeat=True)
+    # anim.save('./'+fig_name+'.gif', dpi=300, writer='PillowWriter', fps=12) 
 
     return axis_list     
 

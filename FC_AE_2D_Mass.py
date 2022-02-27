@@ -263,7 +263,7 @@ if __name__ == '__main__':
     LF = 5
     BATCH_SIZE = 16
     #%%####################### DOWNLOAD DATA #################################
-    for gridID in range(86,87):
+    for gridID in range(1,93):
         # define a random seed
         np.random.seed(123)
         torch.manual_seed(123)
@@ -451,39 +451,39 @@ if __name__ == '__main__':
         Discrete_3D_scatter(test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'Principal Comp. ','Cluster','Grid'+str(gridID)+'_PC_3D',num_clusters)
         
         #%%
-        for ii in range(10):
-            fig = plt.figure(figsize=small_fig_size)
-            ax = fig.add_subplot(211)
-            plt.rc('xtick', labelsize=fig_font_size)    # fontsize of the tick labels
-            plt.rc('ytick', labelsize=fig_font_size)    # fontsize of the tick labels
-            ax.tick_params(direction="in")
-            line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
-            line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
-            ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': fig_font_size})
-            # ax.set_xlabel('Time (min)',fontsize=fig_font_size)
-            ax.set_ylabel('Wind speed in North dir. (m/s)',fontsize=fig_font_size)
+        # for ii in range(10):
+        #     fig = plt.figure(figsize=small_fig_size)
+        #     ax = fig.add_subplot(211)
+        #     plt.rc('xtick', labelsize=fig_font_size)    # fontsize of the tick labels
+        #     plt.rc('ytick', labelsize=fig_font_size)    # fontsize of the tick labels
+        #     ax.tick_params(direction="in")
+        #     line_ori,=ax.plot(T2,np_test_inputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)    
+        #     line_rec,=ax.plot(T2,np_test_outputs[ii,0:len(np_test_inputs[0])//2], linewidth=plt_line_width)
+        #     ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': fig_font_size})
+        #     # ax.set_xlabel('Time (min)',fontsize=fig_font_size)
+        #     ax.set_ylabel('Wind speed in North dir. (m/s)',fontsize=fig_font_size)
                 
-            ax = fig.add_subplot(212)
-            plt.rc('xtick', labelsize=fig_font_size)    # fontsize of the tick labels
-            plt.rc('ytick', labelsize=fig_font_size)    # fontsize of the tick labels
-            ax.tick_params(direction="in")
-            line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
-            line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
-            ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': fig_font_size})
-            ax.set_xlabel('Time (min)',fontsize=fig_font_size)
-            ax.set_ylabel('Wind speed in East dir. (m/s)',fontsize=fig_font_size)
-            plt.rc('xtick', labelsize=fig_font_size)    # fontsize of the tick labels
-            plt.rc('ytick', labelsize=fig_font_size)    # fontsize of the tick labels
+        #     ax = fig.add_subplot(212)
+        #     plt.rc('xtick', labelsize=fig_font_size)    # fontsize of the tick labels
+        #     plt.rc('ytick', labelsize=fig_font_size)    # fontsize of the tick labels
+        #     ax.tick_params(direction="in")
+        #     line_ori,=ax.plot(T2,np_test_inputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)    
+        #     line_rec,=ax.plot(T2,np_test_outputs[ii,len(np_test_inputs[0])//2:], linewidth=plt_line_width)
+        #     ax.legend([line_ori,line_rec],['Original','Reconstructed'],prop={'size': fig_font_size})
+        #     ax.set_xlabel('Time (min)',fontsize=fig_font_size)
+        #     ax.set_ylabel('Wind speed in East dir. (m/s)',fontsize=fig_font_size)
+        #     plt.rc('xtick', labelsize=fig_font_size)    # fontsize of the tick labels
+        #     plt.rc('ytick', labelsize=fig_font_size)    # fontsize of the tick labels
         
-        for ii in range(10):
-            fig = plt.figure(figsize=small_fig_size)
-            ax = fig.add_axes([0, 0, 1, 1])
-            plt.rc('xtick', labelsize=fig_font_size)    # fontsize of the tick labels
-            plt.rc('ytick', labelsize=fig_font_size)    # fontsize of the tick labels
-            ax.tick_params(direction="in")
-            line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
-            ax.set_xlabel('Time (min)',fontsize=fig_font_size)
-            ax.set_ylabel('Wind speed difference (m/s)',fontsize=fig_font_size)
+        # for ii in range(10):
+        #     fig = plt.figure(figsize=small_fig_size)
+        #     ax = fig.add_axes([0, 0, 1, 1])
+        #     plt.rc('xtick', labelsize=fig_font_size)    # fontsize of the tick labels
+        #     plt.rc('ytick', labelsize=fig_font_size)    # fontsize of the tick labels
+        #     ax.tick_params(direction="in")
+        #     line_err,=ax.plot(T,np_test_outputs[ii,:]-np_test_inputs[ii,:], linewidth=plt_line_width)
+        #     ax.set_xlabel('Time (min)',fontsize=fig_font_size)
+        #     ax.set_ylabel('Wind speed difference (m/s)',fontsize=fig_font_size)
         #%% plot error
         error=abs(np_test_inputs-np_test_outputs)
         error=error.flatten() 
