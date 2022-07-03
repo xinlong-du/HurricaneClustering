@@ -263,7 +263,7 @@ if __name__ == '__main__':
     LF = 5
     BATCH_SIZE = 16
     #%%####################### DOWNLOAD DATA #################################
-    for gridID in range(86,87):
+    for gridID in range(1,93):
         # define a random seed
         np.random.seed(123)
         torch.manual_seed(123)
@@ -579,7 +579,7 @@ if __name__ == '__main__':
                 line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width, color=color_list[i])
                 ax2.set_xlabel('Time (min)',fontsize=fig_font_size)
                 ax2.set_ylabel('Wind speed in East dir. (m/s)',fontsize=fig_font_size)
-        plt.savefig('./Grid'+str(gridID)+'seleRecords.jpg', transparent=False, bbox_inches='tight', dpi=500)
+        plt.savefig('../seleRecordsPlot/Grid'+str(gridID)+'seleRecords.jpg', transparent=False, bbox_inches='tight', dpi=500)
         #%% save the clusters
         # change output folder path
         folder_path = '../windRecordsMass'
