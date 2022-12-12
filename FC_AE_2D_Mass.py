@@ -263,7 +263,7 @@ if __name__ == '__main__':
     LF = 5
     BATCH_SIZE = 16
     #%%####################### DOWNLOAD DATA #################################
-    for gridID in range(1,93):
+    for gridID in range(86,87):
         # define a random seed
         np.random.seed(123)
         torch.manual_seed(123)
@@ -448,8 +448,68 @@ if __name__ == '__main__':
         #%%
         # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,np_latent_features,[0,1,2],'Latent Features ','Ground Truth Clusters','LF_3D_gt',num_clusters)
         # Discrete_3D_scatter(test_latents_RSN,ID_dict_gt,principalComponents_latents,[0,1,2],'Principal Comp. ','Ground Truth Clusters','PC_3D_gt',num_clusters)
-        Discrete_3D_scatter(test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'Principal Comp. ','Cluster','Grid'+str(gridID)+'_PC_3D',num_clusters)
+        # Discrete_3D_scatter(test_latents_RSN,ID_dict_discovered,principalComponents_latents,[0,1,2],'Principal Comp. ','Cluster','Grid'+str(gridID)+'_PC_3D',num_clusters)
+        color_name = 'rainbow'
+        big_fig_size = (3.5,4.5)
         
+        dictionary=ID_dict_discovered;
+        latents=principalComponents_latents;
+        latent_feature_plot=[0,1,2];
+        axis_label='Principal Comp. ';
+        cb_label='Cluster';
+        fig_name='Grid'+str(gridID)+'_PC_3D';
+        
+        new_LF = []
+        static_attribute_list = []
+        count = 0
+        # remove data without static attribute to not confuse plotting
+        for i in range(len(test_latents_RSN)): 
+            try:
+                att = dictionary[int(test_latents_RSN[i])]
+            except KeyError:
+                count+= 1
+            else:
+                if len(static_attribute_list) == 0:
+                    new_LF = latents[[i]]
+                    static_attribute_list = [dictionary[int(test_latents_RSN[i])]]
+                else:  
+                    new_LF = np.append(new_LF,[latents[i]],axis = 0)
+                    static_attribute_list.append(att)
+        
+        fig = plt.figure(figsize=big_fig_size)
+        ax1 = fig.add_subplot(111,projection='3d')
+        ax1.xaxis.pane.fill = False
+        ax1.yaxis.pane.fill = False
+        ax1.zaxis.pane.fill = False
+        
+        ax1.set_xlabel(axis_label+str(latent_feature_plot[0]+1),labelpad=0.1,fontsize=fig_font_size)
+        ax1.set_ylabel(axis_label+str(latent_feature_plot[1]+1),labelpad=0.1,fontsize=fig_font_size)
+        ax1.set_zlabel(axis_label+str(latent_feature_plot[2]+1),labelpad=0.1,fontsize=fig_font_size)
+        ax1.set_xticks(np.arange(-2, 3, 1))
+        ax1.set_yticks(np.arange(-2, 3, 1))
+        ax1.set_zticks(np.arange(-2, 3, 1))
+        ax1.xaxis.set_tick_params(which='major', direction='in', pad=0.01)
+        ax1.yaxis.set_tick_params(which='major', direction='in', pad=0.01)
+        ax1.zaxis.set_tick_params(which='major', direction='in', pad=0.01)
+        
+        if num_clusters == 2:
+            p = ax1.scatter(
+                new_LF[:, latent_feature_plot[0]], new_LF[:, latent_feature_plot[1]], new_LF[:, latent_feature_plot[2]],
+                c=static_attribute_list, 
+                cmap=plt.cm.get_cmap(color_name, num_clusters),vmin=0.5,vmax=num_clusters+0.5)
+        else:
+            p = ax1.scatter(
+                new_LF[:, latent_feature_plot[0]], new_LF[:, latent_feature_plot[1]], new_LF[:, latent_feature_plot[2]],
+                c=static_attribute_list, 
+                cmap=plt.cm.get_cmap(color_name, num_clusters),vmin=0.5,vmax=num_clusters+0.5)
+        ax1.view_init(27, 86)
+        
+        cbar=fig.colorbar(p,ticks=range(num_clusters+1), label=cb_label,pad = 0.1, orientation = 'horizontal')
+        cbar.set_label(label=cb_label,fontsize=fig_font_size)
+          
+        plt.tight_layout()
+        plt.savefig('./'+fig_name+'.jpg', transparent=True, bbox_inches='tight', dpi=500)
+        plt.show()
         #%%
         # for ii in range(10):
         #     fig = plt.figure(figsize=small_fig_size)
