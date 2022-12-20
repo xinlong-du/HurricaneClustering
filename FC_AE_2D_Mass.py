@@ -508,7 +508,7 @@ if __name__ == '__main__':
         cbar.set_label(label=cb_label,fontsize=fig_font_size)
           
         plt.tight_layout()
-        plt.savefig('./'+fig_name+'.jpg', transparent=True, bbox_inches='tight', dpi=500)
+        plt.savefig('./'+fig_name+'.tif', transparent=True, bbox_inches='tight', dpi=400)
         plt.show()
         #%%
         # for ii in range(10):
@@ -558,7 +558,7 @@ if __name__ == '__main__':
         plt.xlabel('Reconstruction error (m/s)',fontsize=fig_font_size);
         ax.set_xlim(0.0, 6)
         file_name = 'Grid'+str(gridID)+'_error_hist'
-        plt.savefig('./'+file_name+'.jpg', transparent=True, bbox_inches='tight', dpi=1000)                   
+        plt.savefig('./'+file_name+'.tif', transparent=True, bbox_inches='tight', dpi=400)                   
         # #%% plot latent features clustered using K-means
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid'+str(gridID)+'_LF123')
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid'+str(gridID)+'_LF345')
@@ -617,7 +617,7 @@ if __name__ == '__main__':
                     line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width, linestyle='dashed')
                 ax2.set_xlabel('Time (min)',fontsize=fig_font_size)
                 ax2.set_ylabel('Wind speed in East dir. (m/s)',fontsize=fig_font_size)
-            plt.savefig('./Grid'+str(gridID)+'Cluster'+str(i+1)+'windRecords.jpg', transparent=False, bbox_inches='tight', dpi=500)
+            plt.savefig('./Grid'+str(gridID)+'Cluster'+str(i+1)+'windRecords.tif', transparent=False, bbox_inches='tight', dpi=400)
 
         #%% plot all selected records for different clusters
         color_list=['b','g','r','c','m','y','k','tab:brown']
@@ -639,7 +639,7 @@ if __name__ == '__main__':
                 line_ori,=ax2.plot(T2,spectra[ii-1,len(spectra[0])//2:], linewidth=plt_line_width, color=color_list[i])
                 ax2.set_xlabel('Time (min)',fontsize=fig_font_size)
                 ax2.set_ylabel('Wind speed in East dir. (m/s)',fontsize=fig_font_size)
-        plt.savefig('../seleRecordsPlot/Grid'+str(gridID)+'seleRecords.jpg', transparent=False, bbox_inches='tight', dpi=500)
+        plt.savefig('../seleRecordsPlot/Grid'+str(gridID)+'seleRecords.tif', transparent=False, bbox_inches='tight', dpi=400)
         #%% save the clusters
         # change output folder path
         folder_path = '../windRecordsMass'

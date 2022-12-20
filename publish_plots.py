@@ -405,7 +405,7 @@ def elbow_graph(SSE,sil,file_name):
     ax.set_xlabel('k value',fontsize=fig_font_size)
     ax.set_ylabel('WSS',fontsize=fig_font_size)
     # Save figure
-    plt.savefig('./'+file_name+'.jpg', transparent=True, bbox_inches='tight', dpi=500)
+    plt.savefig('./'+file_name+'.tif', transparent=True, bbox_inches='tight', dpi=400)
     
 def elbow_sil_graph_synthetic(SSE,sil,file_name):
     fig = plt.figure(figsize=(8, 3))
@@ -1315,7 +1315,7 @@ def wind_plot(spectra,T,file_name):
     ax1.set_ylabel('Wind speed in North dir. (m/s)',fontsize=fig_font_size)
     ax2.set_ylabel('Wind speed in East dir. (m/s)',fontsize=fig_font_size)
     # Save figure
-    plt.savefig('./'+file_name+'.jpg', transparent=True, bbox_inches='tight', dpi=500)
+    plt.savefig('./'+file_name+'.tif', transparent=True, bbox_inches='tight', dpi=400)
     
 def wind_plot_difference(spectra,T,file_name):
     fig = plt.figure(figsize=small_fig_size)
