@@ -13,6 +13,6 @@ figHeight=3;
 set(hfig,'PaperUnits','inches');
 set(hfig,'PaperPosition',[0 0 figWidth figHeight]);
 figname=('.\Fig23.'); %Fig. 23 in the paper
-print(hfig,[figname,'jpg'],'-r1000','-djpeg');
+print(hfig,[figname,'tif'],'-r1200','-dtiff');
 
 meanNumClusters=mean(numClusters);

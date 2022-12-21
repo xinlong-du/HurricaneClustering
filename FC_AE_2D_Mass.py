@@ -508,7 +508,7 @@ if __name__ == '__main__':
         cbar.set_label(label=cb_label,fontsize=fig_font_size)
           
         plt.tight_layout()
-        plt.savefig('./'+fig_name+'.tif', transparent=True, bbox_inches='tight', dpi=400)
+        plt.savefig('./'+fig_name+'.tif', transparent=False, bbox_inches='tight', dpi=400)
         plt.show()
         #%%
         # for ii in range(10):
@@ -558,7 +558,7 @@ if __name__ == '__main__':
         plt.xlabel('Reconstruction error (m/s)',fontsize=fig_font_size);
         ax.set_xlim(0.0, 6)
         file_name = 'Grid'+str(gridID)+'_error_hist'
-        plt.savefig('./'+file_name+'.tif', transparent=True, bbox_inches='tight', dpi=400)                   
+        plt.savefig('./'+file_name+'.tif', transparent=False, bbox_inches='tight', dpi=300)                   
         # #%% plot latent features clustered using K-means
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[0,1,2],'LF','LF','Grid'+str(gridID)+'_LF123')
         # Continuous_3D_scatter(np_test_latents_RSN,ID_dict_discovered,np_latent_features,[2,3,4],'LF','LF','Grid'+str(gridID)+'_LF345')
