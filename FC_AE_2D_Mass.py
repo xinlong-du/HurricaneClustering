@@ -502,7 +502,7 @@ if __name__ == '__main__':
                 new_LF[:, latent_feature_plot[0]], new_LF[:, latent_feature_plot[1]], new_LF[:, latent_feature_plot[2]],
                 c=static_attribute_list, 
                 cmap=plt.cm.get_cmap(color_name, num_clusters),vmin=0.5,vmax=num_clusters+0.5)
-        ax1.view_init(27, 86)
+        ax1.view_init(25, 7)
         
         cbar=fig.colorbar(p,ticks=range(num_clusters+1), label=cb_label,pad = 0.1, orientation = 'horizontal')
         cbar.set_label(label=cb_label,fontsize=fig_font_size)
